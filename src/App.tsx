@@ -1,4 +1,5 @@
 import './App.css'
+import { Button } from '@/components/ui/button'
 
 function App() {
   return (
@@ -32,12 +33,19 @@ function App() {
 
           {/* Right Actions — right-aligned */}
           <div className="flex items-center gap-1 shrink-0 justify-self-end">
-            <button className="text-sm font-medium text-gray-300 hover:text-white px-3 py-1.5 rounded-md hover:bg-gray-800 transition-all whitespace-nowrap">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-gray-300 hover:text-white hover:bg-gray-800 whitespace-nowrap"
+            >
               Sign In
-            </button>
-            <button className="text-sm font-semibold bg-orange-500 text-white px-4 py-1.5 rounded-md hover:bg-orange-400 transition-colors whitespace-nowrap">
+            </Button>
+            <Button
+              size="sm"
+              className="bg-orange-500 text-white hover:bg-orange-400 whitespace-nowrap font-semibold"
+            >
               Register
-            </button>
+            </Button>
           </div>
         </div>
       </nav>
