@@ -81,7 +81,7 @@ function App() {
           <div className="relative max-w-lg">
             <p className="text-orange-400 text-sm font-semibold uppercase tracking-wide">Live Auctions</p>
             <h2 className="mt-2 text-2xl md:text-3xl font-bold text-white leading-snug">
-              Bid on items you love — deals end soon
+              CODE CHANGE Bid on items you love — deals end soon
             </h2>
             <button className="mt-5 px-6 py-2.5 bg-orange-500 text-white text-sm font-semibold rounded-lg hover:bg-orange-400 transition-colors">
               Browse Auctions
