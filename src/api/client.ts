@@ -1,12 +1,22 @@
 import { API_BASE_URL } from "./config";
 
-export async function apiFetch<T>(path: string, options: RequestInit = {}) {
+type ApiOptions = RequestInit & {
+  token?: string | null;
+};
+
+export async function apiFetch<T>(
+  path: string,
+  options: ApiOptions = {},
+): Promise<T> {
+  const { token, headers, ...rest } = options;
+
   const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...rest,
     headers: {
       "Content-Type": "application/json",
-      ...(options.headers || {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...headers,
     },
-    ...options,
   });
 
   const data = await response.json().catch(() => ({}));
@@ -15,5 +25,5 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}) {
     throw data;
   }
 
-  return data;
+  return data as T;
 }
