@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { apiFetch } from "./api/client";
 import { endpoints } from "./api/endpoints";
+import { useNavigate } from "react-router-dom";
 
 //Gather token response
 
@@ -49,7 +50,10 @@ function getErrorMessage(err: unknown) {
   return "Request failed";
 }
 
-export default function Authentication(props: { onAuthed?: () => void }) {
+export default function Authentication(props: {
+  onAuthed?: () => void;
+  onBack?: () => void;
+}) {
   // Login or sign up mode
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [loading, setLoading] = useState(false);
@@ -66,6 +70,8 @@ export default function Authentication(props: { onAuthed?: () => void }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [address, setAddress] = useState("");
+
+  const navigate = useNavigate();
 
   // Function for submission of login or sign up info
 
@@ -112,7 +118,7 @@ export default function Authentication(props: { onAuthed?: () => void }) {
   return (
     <div className="min-h-screen bg-stone-100 text-gray-900 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
-        <CardContent className="p-6 space-y-4">
+        <CardContent className="space-y-4">
           <div className="space-y-1">
             <h1 className="text-xl font-bold">
               {mode === "login" ? "Sign in" : "Create account"}
@@ -123,7 +129,6 @@ export default function Authentication(props: { onAuthed?: () => void }) {
                 : "Fill out the required details to sign up."}
             </p>
           </div>
-
           <div className="flex gap-2">
             <Button
               type="button"
@@ -208,6 +213,17 @@ export default function Authentication(props: { onAuthed?: () => void }) {
                   ? "Sign In"
                   : "Register"}
             </Button>
+            <div className="text-center">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="w-full hover:text-gray-900"
+                onClick={() => (props.onBack ? props.onBack() : navigate("/"))}
+              >
+                Back to home
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>

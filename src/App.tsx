@@ -4,45 +4,16 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Authentication from "./authentication";
-import CataloguePage from "./catalogue";
 
 function App() {
+  const navigate = useNavigate();
+
   const [showAuth, setShowAuth] = useState(() => {
     return !localStorage.getItem("access_token");
   });
-  const [currentPath, setCurrentPath] = useState(() => window.location.pathname);
-
-  useEffect(() => {
-    function handlePopState() {
-      setCurrentPath(window.location.pathname);
-    }
-
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, []);
-
-  function navigate(path: string) {
-    if (window.location.pathname !== path) {
-      window.history.pushState({}, "", path);
-      setCurrentPath(path);
-    }
-  }
-
-  if (showAuth) {
-    return (
-      <Authentication
-        onAuthed={() => {
-          setShowAuth(false); // Hide authentication once login is successful
-        }}
-      />
-    );
-  }
-
-  if (currentPath === "/catalogue") {
-    return <CataloguePage />;
-  }
 
   return (
     <div className="min-h-screen bg-stone-100 text-gray-900 flex flex-col">
@@ -92,22 +63,36 @@ function App() {
 
           {/* Right Actions — right-aligned */}
           <div className="flex items-center gap-1 shrink-0 justify-self-end">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-300 hover:text-white hover:bg-gray-800 whitespace-nowrap"
-              //Show authentication fields when sign in button is clicked
-              onClick={() => setShowAuth(true)}
-            >
-              Sign In
-            </Button>
-            <Button
-              size="sm"
-              className="bg-orange-500 text-white hover:bg-orange-400 whitespace-nowrap font-semibold"
-              onClick={() => setShowAuth(true)}
-            >
-              Register
-            </Button>
+            {showAuth ? (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-300 hover:text-white hover:bg-gray-800 whitespace-nowrap"
+                  onClick={() => navigate("/auth")}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-orange-500 text-white hover:bg-orange-400 whitespace-nowrap font-semibold"
+                  onClick={() => navigate("/auth")}
+                >
+                  Register
+                </Button>
+              </>
+            ) : (
+              <Button
+                size="sm"
+                className="bg-orange-500 text-white hover:bg-orange-400 whitespace-nowrap font-semibold"
+                onClick={() => {
+                  localStorage.removeItem("access_token");
+                  setShowAuth(true);
+                }}
+              >
+                Log out
+              </Button>
+            )}
           </div>
         </div>
       </nav>
