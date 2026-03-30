@@ -14,7 +14,7 @@ type TokenResponse = {
 
 //Obtain list of errors in order to display them in the frontend
 
-type errorList = {
+type ErrorList = {
   detail?: Array<{
     loc?: Array<string | number>
     msg?: string
@@ -25,7 +25,7 @@ type errorList = {
 function getErrorMessage(err: unknown) {
   if (!err || typeof err !== "object") return "Request failed"
 
-  const maybe = err as errorList
+  const maybe = err as ErrorList
   const detail = maybe.detail
 
   // Display singular error message
@@ -95,11 +95,10 @@ export default function Authentication(props: { onAuthed?: () => void }) {
 
       //Login mode
       if (mode === "login") {
-        const token = await apiJson<TokenResponse>("/auth/login", {
+        await apiJson<TokenResponse>("/auth/login", {
           method: "POST",
           body: JSON.stringify({ username, password }),
         })
-        localStorage.setItem("access_token", token.access_token)
         props.onAuthed?.()
         return
       }

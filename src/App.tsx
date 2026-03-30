@@ -4,21 +4,60 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Authentication from './authentication'
 
 
 function App() {
 
-  const [showAuth, setShowAuth] = useState(() => {
-  return !localStorage.getItem("access_token")
-  })
+  const [showAuth, setShowAuth] = useState(true)
+  const [loadingAuth, setLoadingAuth] = useState(true)
+  const [user, setUser] = useState<{username: string} | null>(null)
+  
+  const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "/api"
+
+  useEffect(() => {
+    fetch(`${API_BASE}/auth/me`)
+      .then(res => {
+        if (res.ok) {
+          setShowAuth(false)
+          return res.json()
+        } else {
+          setShowAuth(true)
+          return null
+        }
+      })
+      .then(data => data && setUser(data))
+      .catch(() => setShowAuth(true))
+      .finally(() => setLoadingAuth(false))
+  }, [API_BASE])
+
+  async function handleLogout() {
+    await fetch(`${API_BASE}/auth/logout`, { method: "POST" })
+    setUser(null)
+    setShowAuth(true)
+  }
+
+  if (loadingAuth) {
+    return (
+      <div className="min-h-screen bg-stone-100 flex items-center justify-center text-gray-500">
+        <p>Loading StackOverbid...</p>
+      </div>
+    )
+  }
 
   if (showAuth) {
     return (
       <Authentication
         onAuthed={() => {
-          setShowAuth(false) // Hide authentication once login is successful
+          // Fetch user data after successful authentication
+          fetch(`${API_BASE}/auth/me`)
+            .then(res => res.json())
+            .then(data => {
+              setUser(data)
+              setShowAuth(false)
+            })
+            .catch(() => setShowAuth(false))
         }}
       />
     )
@@ -57,24 +96,15 @@ function App() {
           </div>
 
           {/* Right Actions — right-aligned */}
-          <div className="flex items-center gap-1 shrink-0 justify-self-end">
+          <div className="flex items-center gap-4 shrink-0 justify-self-end">
+            {user && <span className="hidden sm:inline text-sm text-gray-300 font-medium">Hello, {user.username}</span>}
             <Button
               variant="ghost"
               size="sm"
               className="text-gray-300 hover:text-white hover:bg-gray-800 whitespace-nowrap"
-              
-              //Show authentication fields when sign in button is clicked
-              onClick={() => setShowAuth(true)}
+              onClick={handleLogout}
             >
-              Sign In
-            </Button>
-            <Button
-              size="sm"
-              className="bg-orange-500 text-white hover:bg-orange-400 whitespace-nowrap font-semibold"
-              
-              onClick={() => setShowAuth(true)}
-            >
-              Register
+              Log Out
             </Button>
           </div>
         </div>
