@@ -141,15 +141,17 @@ export function CheckoutPage() {
           </Link>
         </div>
 
-        <Card className="border-emerald-200 bg-emerald-50/40">
+        <Card className="border-emerald-200 bg-emerald-50/40 dark:border-emerald-500/35 dark:bg-emerald-950/50 dark:shadow-none">
           <CardHeader>
             <div className="flex items-start gap-3">
-              <div className="rounded-lg bg-emerald-100 p-2">
-                <CheckCircle2 className="h-6 w-6 text-emerald-700" />
+              <div className="rounded-lg bg-emerald-100 p-2 dark:bg-emerald-900/90 dark:ring-1 dark:ring-emerald-400/25">
+                <CheckCircle2 className="h-6 w-6 text-emerald-700 dark:text-emerald-300" />
               </div>
               <div>
-                <CardTitle className="text-lg text-emerald-950">Payment successful</CardTitle>
-                <CardDescription className="text-emerald-900/80">
+                <CardTitle className="text-lg text-emerald-950 dark:text-emerald-50">
+                  Payment successful
+                </CardTitle>
+                <CardDescription className="text-emerald-900/80 dark:text-emerald-200/95">
                   Your order is confirmed. Keep this summary for your records.
                 </CardDescription>
               </div>
@@ -157,34 +159,38 @@ export function CheckoutPage() {
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div className="flex justify-between gap-2">
-              <span className="text-gray-600 dark:text-muted-foreground shrink-0">Order</span>
-              <span className="font-mono text-gray-900 dark:text-foreground text-right">#{receipt.orderId}</span>
+              <span className="text-gray-600 dark:text-emerald-200/80 shrink-0">Order</span>
+              <span className="font-mono text-gray-900 dark:text-emerald-50 text-right">#{receipt.orderId}</span>
             </div>
             <div className="flex justify-between gap-2">
-              <span className="text-gray-600 dark:text-muted-foreground shrink-0">Item</span>
-              <span className="text-gray-900 dark:text-foreground text-right max-w-[14rem]">{receipt.itemTitle}</span>
+              <span className="text-gray-600 dark:text-emerald-200/80 shrink-0">Item</span>
+              <span className="text-gray-900 dark:text-emerald-50 text-right max-w-[14rem]">{receipt.itemTitle}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-muted-foreground">Amount paid</span>
-              <span className="font-semibold tabular-nums text-gray-900 dark:text-foreground">
+              <span className="text-gray-600 dark:text-emerald-200/80">Amount paid</span>
+              <span className="font-semibold tabular-nums text-gray-900 dark:text-emerald-50">
                 {formatMoney(receipt.amountPaid, checkout?.currency ?? APP_CURRENCY)}
               </span>
             </div>
             <div className="flex justify-between gap-2 items-start">
-              <span className="text-gray-600 dark:text-muted-foreground shrink-0">Ship to</span>
-              <span className="text-gray-900 dark:text-foreground text-right text-xs max-w-[16rem]">{receipt.shippingAddress}</span>
+              <span className="text-gray-600 dark:text-emerald-200/80 shrink-0">Ship to</span>
+              <span className="text-gray-900 dark:text-emerald-50 text-right text-xs max-w-[16rem]">
+                {receipt.shippingAddress}
+              </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-muted-foreground">Shipping</span>
-              <span className="text-gray-900 dark:text-foreground">
+              <span className="text-gray-600 dark:text-emerald-200/80">Shipping</span>
+              <span className="text-gray-900 dark:text-emerald-50">
                 {receipt.expeditedShipping ? 'Expedited' : 'Standard'} · est. {receipt.shippingTimeDays}{' '}
                 day{receipt.shippingTimeDays === 1 ? '' : 's'}
               </span>
             </div>
             {receipt.message ? (
-              <p className="text-xs text-emerald-900/90 border-t border-emerald-200/60 pt-2">{receipt.message}</p>
+              <p className="text-xs text-emerald-900/90 dark:text-emerald-100 border-t border-emerald-200/60 dark:border-emerald-600/45 pt-2 whitespace-pre-wrap">
+                {receipt.message}
+              </p>
             ) : null}
-            <p className="text-xs text-gray-500 dark:text-muted-foreground">
+            <p className="text-xs text-gray-500 dark:text-emerald-200/70">
               Paid {new Date(receipt.paidAt).toLocaleString()}
             </p>
             <Button asChild className="w-full bg-orange-500 hover:bg-orange-400 text-white font-semibold mt-2">
@@ -274,9 +280,12 @@ export function CheckoutPage() {
               Ship to: {checkout.shippingAddressSummary}
             </p>
             {!checkout.hasShippingAddress && (
-              <p className="text-xs text-amber-900 pt-2 border-t border-amber-200/80 mt-2">
+              <p className="text-xs text-amber-900 dark:text-amber-100 pt-2 border-t border-amber-200/80 dark:border-amber-600/50 mt-2">
                 Add a shipping address in your{' '}
-                <Link to="/profile" className="font-semibold text-orange-700 hover:text-orange-800 underline">
+                <Link
+                  to="/profile"
+                  className="font-semibold text-orange-700 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-300 underline"
+                >
                   profile
                 </Link>{' '}
                 before paying.

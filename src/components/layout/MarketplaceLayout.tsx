@@ -52,10 +52,15 @@ export function MarketplaceLayout() {
   }, [API_BASE])
 
   async function handleLogout() {
-    await fetch(`${API_BASE}/auth/logout`, { method: "POST", credentials: "include" })
+    try {
+      await fetch(`${API_BASE}/auth/logout`, { method: "POST", credentials: "include" })
+    } catch {
+      /* still clear local session and leave protected routes */
+    }
     setUser(null)
     setProfileOpen(false)
     setShowAuth(false)
+    navigate('/', { replace: true })
   }
 
   if (showAuth) {

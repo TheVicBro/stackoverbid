@@ -3,30 +3,18 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { AlertCircle, CheckCircle2, Gavel, Pencil, Trophy } from 'lucide-react'
 import { placeBid } from '@/api/auction'
 import { useAuctionDetail } from '@/hooks/useAuctionDetail'
+import { useLiveAuctionCountdown } from '@/hooks/useLiveAuctionCountdown'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { formatAppCurrency } from '@/lib/currency'
-import { cn, parseUtcInstantMs } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import type { AuctionDetail } from '@/types/auction'
 
 function formatMoney(n: number) {
   return formatAppCurrency(n)
-}
-
-function timeLeft(endsAt: string | null) {
-  if (!endsAt) return '—'
-  const end = parseUtcInstantMs(endsAt)
-  if (!Number.isFinite(end)) return '—'
-  const now = Date.now()
-  const s = Math.max(0, Math.floor((end - now) / 1000))
-  const h = Math.floor(s / 3600)
-  const m = Math.floor((s % 3600) / 60)
-  if (h > 48) return `${Math.floor(h / 24)}d ${h % 24}h`
-  if (h > 0) return `${h}h ${m}m`
-  return `${m}m ${s % 60}s`
 }
 
 export function AuctionDetailPage() {
@@ -35,6 +23,7 @@ export function AuctionDetailPage() {
   const viewerIsSeller = searchParams.get('as') === 'seller'
 
   const { auction, loading, loadError, refresh } = useAuctionDetail(auctionId, viewerIsSeller)
+  const countdown = useLiveAuctionCountdown(auction?.endsAt ?? null, auction?.status === 'LIVE')
   const [bidInput, setBidInput] = useState('')
   const [bidSubmitting, setBidSubmitting] = useState(false)
   const [bidError, setBidError] = useState<string | null>(null)
@@ -46,6 +35,14 @@ export function AuctionDetailPage() {
       if (successClearRef.current) window.clearTimeout(successClearRef.current)
     }
   }, [])
+
+  useEffect(() => {
+    if (!countdown.isFinalizing || !auctionId) return
+    const id = window.setInterval(() => {
+      void refresh()
+    }, 2000)
+    return () => window.clearInterval(id)
+  }, [countdown.isFinalizing, auctionId, refresh])
 
   const minNextBid = useMemo(() => {
     if (!auction || auction.status !== 'LIVE') return 0
@@ -280,8 +277,17 @@ export function AuctionDetailPage() {
               </div>
               <div className="rounded-lg bg-stone-50 border border-stone-100 p-3 dark:bg-muted/40 dark:border-border">
                 <p className="text-gray-500 dark:text-muted-foreground text-xs font-medium uppercase">Time left</p>
-                <p className="text-xl font-semibold text-gray-900 dark:text-foreground">{timeLeft(auction.endsAt)}</p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Updates every few seconds.</p>
+                <p
+                  className={cn(
+                    'text-xl font-semibold tabular-nums text-gray-900 dark:text-foreground',
+                    countdown.isFinalizing && 'text-amber-800 dark:text-amber-200'
+                  )}
+                >
+                  {countdown.primary}
+                </p>
+                {countdown.hint && (
+                  <p className="text-xs text-gray-500 dark:text-muted-foreground mt-1 leading-snug">{countdown.hint}</p>
+                )}
               </div>
             </div>
           )}
