@@ -4,10 +4,7 @@ import { Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-/**
- * Shadcn-style wrapper around `next-themes` (see https://ui.shadcn.com/docs/dark-mode/vite).
- * `attribute="class"` + `.dark` in `index.css` drives Tailwind `dark:` variants.
- */
+// next-themes: sets class on documentElement so theme CSS vars apply.
 export function ThemeProvider({
   children,
   ...props
@@ -26,7 +23,6 @@ export function ThemeProvider({
   )
 }
 
-/** Header: moon in light UI, sun when resolved theme is dark (nav bar stays dark). */
 export function ThemeToggle({ className }: { className?: string }) {
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
@@ -53,7 +49,6 @@ export function ThemeToggle({ className }: { className?: string }) {
   )
 }
 
-/** Auth screen / secondary: uses semantic colors. */
 export function ThemeToggleMuted({ className }: { className?: string }) {
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)

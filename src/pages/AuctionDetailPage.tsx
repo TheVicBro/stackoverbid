@@ -195,7 +195,10 @@ export function AuctionDetailPage() {
               )}
               {auction.outcome === 'SOLD' && <Badge className="bg-orange-500 hover:bg-orange-500">Sold</Badge>}
               {auction.outcome === 'UNSOLD' && (
-                <Badge variant="outline" className="border-amber-400 text-amber-900">
+                <Badge
+                  variant="outline"
+                  className="border-amber-400 text-amber-900 dark:border-orange-500/70 dark:bg-orange-950/50 dark:text-orange-200"
+                >
                   Unsold
                 </Badge>
               )}

@@ -1,4 +1,3 @@
-import './App.css'
 import { Route, Routes } from 'react-router-dom'
 import { MarketplaceLayout } from '@/components/layout/MarketplaceLayout'
 import { AuctionDetailPage } from '@/pages/AuctionDetailPage'

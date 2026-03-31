@@ -5,15 +5,11 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { ThemeToggleMuted } from "@/theme/ThemeProvider"
 
-//Gather token response
-
 type TokenResponse = {
   access_token: string
   token_type: "bearer" | string
   links?: Array<{ rel: string; href: string; method: string }>
 }
-
-//Obtain list of errors in order to display them in the frontend
 
 type ErrorList = {
   detail?: Array<{
@@ -29,12 +25,10 @@ function getErrorMessage(err: unknown) {
   const maybe = err as ErrorList
   const detail = maybe.detail
 
-  // Display singular error message
   if (typeof detail === "string" && detail.trim()) {
     return detail
   }
 
-  // Display multiple error messages if needed
   if (Array.isArray(detail)) {
     const messages = detail
       .map((e) => e?.msg)
@@ -52,19 +46,12 @@ export default function Authentication(props: { onAuthed?: () => void, onCancel?
     return (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "/api"
   }, [])
 
-  // Login or sign up mode
   const [mode, setMode] = useState<"login" | "signup">(props.initialMode ?? "login")
   const [loading, setLoading] = useState(false)
-
-  // Error and success
   const [success, setSuccess] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-
-  // Login/sign up fields
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-
-  // Sign up fields
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
 
@@ -83,9 +70,6 @@ export default function Authentication(props: { onAuthed?: () => void, onCancel?
     return data as T
   }
 
-
-  // Function for submission of login or sign up info
-
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
@@ -93,8 +77,6 @@ export default function Authentication(props: { onAuthed?: () => void, onCancel?
     setLoading(true)
 
     try {
-
-      //Login mode
       if (mode === "login") {
         await apiJson<TokenResponse>("/auth/login", {
           method: "POST",
@@ -104,8 +86,6 @@ export default function Authentication(props: { onAuthed?: () => void, onCancel?
         return
       }
 
-      //Sign up mode
-      // Auto-capitalize first and last names
       const formatName = (name: string) => name.trim().replace(/\b\w/g, c => c.toUpperCase());
       
       await apiJson("/auth/signup", {
@@ -118,7 +98,6 @@ export default function Authentication(props: { onAuthed?: () => void, onCancel?
         }),
       })
 
-      // Auto-login after successful registration
       await apiJson<TokenResponse>("/auth/login", {
         method: "POST",
         body: JSON.stringify({ username, password }),

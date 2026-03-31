@@ -5,10 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-/**
- * Parse API datetimes that are UTC but often serialized without `Z`. Without an offset,
- * `Date` treats ISO strings as *local* time (ECMAScript), skewing countdowns by the TZ offset.
- */
+// API often omits Z on UTC timestamps; Date would parse those as local without it.
 export function parseUtcInstantMs(iso: string | null | undefined): number {
   if (iso == null || iso === "") return NaN
   const t = iso.trim()
@@ -18,19 +15,19 @@ export function parseUtcInstantMs(iso: string | null | undefined): number {
   return Date.parse(t)
 }
 
-/** Strip non-digits; cap length (e.g. 19 for PAN, 4 for CVC). */
+// Digits only, max length (PAN vs CVC).
 export function digitsOnlyMax(value: string, maxLen: number): string {
   return value.replace(/\D/g, "").slice(0, maxLen)
 }
 
-/** As-you-type card expiry: digits only, max 4, inserts slash → MM/YY. */
+// Expiry field: up to 4 digits, slash after MM.
 export function formatCardExpiryInput(value: string): string {
   const digits = value.replace(/\D/g, "").slice(0, 4)
   if (digits.length <= 2) return digits
   return `${digits.slice(0, 2)}/${digits.slice(2)}`
 }
 
-/** Ensure API always gets MM/YY or MM-YY if user pasted plain digits. */
+// Normalize pasted expiry to MM/YY for the API.
 export function normalizeCardExpiryForApi(value: string): string {
   const s = value.trim().replace(/\s/g, "")
   if (s.includes("/") || s.includes("-")) return s

@@ -14,7 +14,7 @@ export interface MyListingRow {
   image_urls?: string[]
 }
 
-export type FetchMyListingsResult =
+type FetchMyListingsResult =
   | { ok: true; items: MyListingRow[] }
   | { ok: false; status: number; message: string }
 
