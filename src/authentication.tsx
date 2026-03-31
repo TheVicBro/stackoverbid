@@ -104,13 +104,16 @@ export default function Authentication(props: { onAuthed?: () => void }) {
       }
 
       //Sign up mode
+      // Auto-capitalize first and last names
+      const formatName = (name: string) => name.trim().replace(/\b\w/g, c => c.toUpperCase());
+      
       await apiJson("/auth/signup", {
         method: "POST",
         body: JSON.stringify({
           username,
           password,
-          first_name: firstName,
-          last_name: lastName,
+          first_name: formatName(firstName),
+          last_name: formatName(lastName),
           address,
         }),
       })
@@ -185,13 +188,13 @@ export default function Authentication(props: { onAuthed?: () => void }) {
               <>
                 <Input
                   value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  onChange={(e) => setFirstName(e.target.value.replace(/\b\w/g, c => c.toUpperCase()))}
                   placeholder="First name"
                   autoComplete="given-name"
                 />
                 <Input
                   value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
+                  onChange={(e) => setLastName(e.target.value.replace(/\b\w/g, c => c.toUpperCase()))}
                   placeholder="Last name"
                   autoComplete="family-name"
                 />
