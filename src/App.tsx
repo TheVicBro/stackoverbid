@@ -17,7 +17,7 @@ function App() {
   const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "/api"
 
   useEffect(() => {
-    fetch(`${API_BASE}/auth/me`)
+    fetch(`${API_BASE}/auth/me`, { credentials: "include" })
       .then(res => res.ok ? res.json() : null)
       .then(data => setUser(data))
       .catch((e) => console.error("Auth check failed:", e))
@@ -25,7 +25,7 @@ function App() {
   }, [API_BASE])
 
   async function handleLogout() {
-    await fetch(`${API_BASE}/auth/logout`, { method: "POST" })
+    await fetch(`${API_BASE}/auth/logout`, { method: "POST", credentials: "include" })
     setUser(null)
     setShowAuth(false)
   }
@@ -44,7 +44,7 @@ function App() {
         initialMode={showAuth === "signup" ? "signup" : "login"}
         onAuthed={() => {
           // Fetch user data after successful authentication
-          fetch(`${API_BASE}/auth/me`)
+          fetch(`${API_BASE}/auth/me`, { credentials: "include" })
             .then(res => res.json())
             .then(data => {
               setUser(data)

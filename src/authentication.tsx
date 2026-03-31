@@ -70,6 +70,7 @@ export default function Authentication(props: { onAuthed?: () => void, onCancel?
   async function apiJson<T>(path: string, init: RequestInit): Promise<T> {
     const res = await fetch(`${API_BASE}${path}`, {
       ...init,
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         ...(init.headers ?? {}),
