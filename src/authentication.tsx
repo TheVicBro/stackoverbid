@@ -115,7 +115,13 @@ export default function Authentication(props: { onAuthed?: () => void }) {
         }),
       })
 
-        setSuccess("Welcome to StackOverbid! You can now log in.")
+      // Auto-login after successful registration
+      await apiJson<TokenResponse>("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ username, password }),
+      })
+      props.onAuthed?.()
+      return
 
     } catch (err) {
       setError(getErrorMessage(err))
