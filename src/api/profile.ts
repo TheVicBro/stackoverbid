@@ -59,7 +59,7 @@ export async function updateProfile(patch: {
   }
 
   let res = await fetch(`${API_BASE}/auth/me`, init)
-  // Stale backends only expose GET /auth/me → 405. POST /auth/profile is a widely compatible fallback.
+  // If PUT is not allowed, retry with POST /auth/profile.
   if (res.status === 405 || res.status === 404) {
     res = await fetch(`${API_BASE}/auth/profile`, {
       ...init,

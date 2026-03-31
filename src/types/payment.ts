@@ -1,18 +1,18 @@
-/** Phase 1: item + shipping preview before pay (UC5). */
+/** Checkout preview before submitting payment. */
 export interface CheckoutDTO {
   auctionId: string
   title: string
   itemPrice: number
-  /** Added to total when buyer selects expedited shipping (matches backend strategy). */
+  /** Added to total when the buyer selects expedited shipping. */
   expeditedShippingFee: number
   currency: string
-  /** From profile or placeholder — backend uses profile address if pay request omits override. */
+  /** Saved profile address or a prompt to add one before paying. */
   shippingAddressSummary: string
-  /** False when profile has no usable shipping address (user should fill profile before paying). */
+  /** False when no shipping address is saved on the profile. */
   hasShippingAddress: boolean
 }
 
-/** Receipt from POST /payment/items/{id}/pay or GET /payment/orders/{id}/receipt (UC5–UC6). */
+/** Confirmed order after successful payment. */
 export interface PaymentReceiptDTO {
   orderId: number
   itemId: number
@@ -25,7 +25,7 @@ export interface PaymentReceiptDTO {
   message: string
 }
 
-/** Form payload — mock only; backend validates format like a payment facade. */
+/** Card fields collected on the checkout form (validated server-side). */
 export interface CardDetailsInput {
   nameOnCard: string
   cardNumber: string

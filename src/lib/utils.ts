@@ -23,7 +23,7 @@ export function digitsOnlyMax(value: string, maxLen: number): string {
   return value.replace(/\D/g, "").slice(0, maxLen)
 }
 
-/** As-you-type card expiry: digits only, max 4, inserts slash → MM/YY (matches backend PaymentRequest). */
+/** As-you-type card expiry: digits only, max 4, inserts slash → MM/YY. */
 export function formatCardExpiryInput(value: string): string {
   const digits = value.replace(/\D/g, "").slice(0, 4)
   if (digits.length <= 2) return digits

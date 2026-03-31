@@ -18,11 +18,11 @@ export interface AuctionDetail {
   outcome?: AuctionOutcome
   /** Set when SOLD — used for winner / unpaid order flows */
   unpaidOrderId?: string
-  /** Mock: true when the signed-in user is the seller (UC4 seller view) */
+  /** True when the signed-in user owns this listing (seller tools and messaging). */
   viewerIsSeller: boolean
-  /** True when the signed-in user is the winning bidder (highest_bidder_id). */
+  /** True when the signed-in user is the high bidder. */
   viewerIsWinner: boolean
-  /** Backend item.status === 'paid' after checkout. */
+  /** True after checkout has completed for this item. */
   isPaid?: boolean
 }
 
@@ -53,6 +53,6 @@ export interface AppNotification {
   body: string
   createdAt: string
   read: boolean
-  /** When set, winner can open checkout for this item. */
-  checkoutItemId?: string
+  /** Catalogue item id — open the auction detail page (checkout is linked from there when you won). */
+  auctionItemId?: string
 }

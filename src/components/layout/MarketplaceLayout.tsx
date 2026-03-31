@@ -1,5 +1,6 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { Gavel } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
@@ -159,6 +160,18 @@ export function MarketplaceLayout() {
                           <circle cx="12" cy="7" r="4" />
                         </svg>
                         Profile & address
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full justify-start text-gray-700 hover:text-orange-600 hover:bg-orange-50 gap-2"
+                        onClick={() => {
+                          setProfileOpen(false)
+                          navigate('/my/auctions')
+                        }}
+                      >
+                        <Gavel className="h-3.5 w-3.5" />
+                        My bids & purchases
                       </Button>
                       <Button variant="ghost" size="sm" className="w-full justify-start text-gray-700 hover:text-orange-600 hover:bg-orange-50 gap-2" asChild onClick={() => setProfileOpen(false)}>
                         <Link to="/sell">
@@ -345,9 +358,19 @@ export function MarketplaceLayout() {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-orange-400 transition-colors">
-                    My Bids
-                  </a>
+                  {user ? (
+                    <Link to="/my/auctions" className="hover:text-orange-400 transition-colors">
+                      My bids & purchases
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setShowAuth('login')}
+                      className="hover:text-orange-400 transition-colors cursor-pointer bg-transparent border-0 p-0 text-inherit font-inherit text-left w-full"
+                    >
+                      My bids & purchases
+                    </button>
+                  )}
                 </li>
               </ul>
             </div>

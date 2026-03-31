@@ -149,10 +149,7 @@ export async function getCheckoutPage(
   }
 }
 
-/**
- * UC5: POST /payment/items/{item_id}/pay (mock card fields validated server-side).
- * UC6: then GET /payment/orders/{order_id}/receipt to confirm persisted receipt.
- */
+/** Submit payment, then verify receipt with GET /payment/orders/{id}/receipt. */
 export async function processTransaction(
   cardDetails: CardDetailsInput,
   auctionId: string,

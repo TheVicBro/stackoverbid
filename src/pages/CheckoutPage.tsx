@@ -149,7 +149,7 @@ export function CheckoutPage() {
               <div>
                 <CardTitle className="text-lg text-emerald-950">Payment successful</CardTitle>
                 <CardDescription className="text-emerald-900/80">
-                  Receipt from your API (UC5–UC6): POST pay, then confirmed with GET receipt.
+                  Your order is confirmed. Keep this summary for your records.
                 </CardDescription>
               </div>
             </div>
@@ -223,7 +223,7 @@ export function CheckoutPage() {
             <div>
               <CardTitle className="text-lg">Pay for your win</CardTitle>
               <CardDescription className="mt-1">
-                Mock card form — values are validated by the backend payment facade (no real charges).
+                Pay with a card below. This checkout uses a demo payment flow — no real money is charged.
               </CardDescription>
             </div>
           </div>
@@ -245,7 +245,7 @@ export function CheckoutPage() {
               <span className="text-sm">
                 <span className="font-medium text-gray-900">Expedited shipping</span>
                 <span className="text-gray-600 block text-xs mt-0.5">
-                  Add {formatMoney(checkout.expeditedShippingFee, checkout.currency)} (matches server shipping strategy)
+                  Add {formatMoney(checkout.expeditedShippingFee, checkout.currency)} to your total
                 </span>
               </span>
             </label>
@@ -286,7 +286,7 @@ export function CheckoutPage() {
           <div className="flex gap-2 rounded-md border border-blue-100 bg-blue-50/80 px-3 py-2 text-xs text-blue-950">
             <ShieldCheck className="h-4 w-4 shrink-0 mt-0.5" />
             <span>
-              Demo only: card fields are sent to your API over HTTPS (cookie session). Use a PSP or tokens in production.
+              Your session is protected. Card details are sent securely; only use test card data in this demo environment.
             </span>
           </div>
 
@@ -321,7 +321,7 @@ export function CheckoutPage() {
                 maxLength={19}
               />
               <p className="text-[11px] text-gray-500">
-                Must pass server rules: 13–19 digits, valid MM/YY expiry, 3–4 digit CVC (e.g. test card 4111111111111111).
+                13–19 digits, expiry as MM/YY, and a 3–4 digit security code (e.g. 4111 1111 1111 1111 for testing).
               </p>
             </div>
             <div className="grid grid-cols-2 gap-3">

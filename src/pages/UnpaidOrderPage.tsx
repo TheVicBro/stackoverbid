@@ -77,7 +77,7 @@ export function UnpaidOrderPage() {
             <div>
               <CardTitle className="text-lg">Complete your purchase</CardTitle>
               <CardDescription className="mt-1">
-                UC4: unpaid order summary. Use Pay now to open UC5 checkout (item price + shipping + card form).
+                Review the amount due, then continue to checkout to pay with your card and confirm shipping.
               </CardDescription>
             </div>
           </div>

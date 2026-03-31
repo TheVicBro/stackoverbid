@@ -1,11 +1,10 @@
 import type { AuctionDetail, PlaceBidResult, UnpaidOrder } from '@/types/auction'
 
 /**
- * Replace mock implementations with fetch() to your backend once the Vite proxy is set up.
- * Example: fetch('/api/auctions/${id}', { credentials: 'include' })
+ * Sample auction fixtures (e.g. sample-live) for local demos. Real pages use the catalogue API.
  */
 
-/** In-memory state for the interactive live demo auction */
+/** Sample live auction state for demo IDs only */
 let liveAuctionState = {
   currentBid: 100,
   minIncrement: 1,
@@ -21,8 +20,7 @@ function baseDetail(
 ): AuctionDetail {
   return {
     id,
-    description:
-      'This is placeholder copy. Replace with catalogue data from your API when integrated.',
+    description: 'Sample listing description for offline demos.',
     imageUrls: [],
     currentBid: 0,
     minIncrement: 1,
@@ -45,7 +43,7 @@ export function getAuction(
       if (auctionId === 'sample-live') {
         resolve(
           baseDetail('sample-live', {
-            title: 'Vintage Camera — Live bidding (mock)',
+            title: 'Vintage Camera — live auction (sample)',
             status: 'LIVE',
             currentBid: liveAuctionState.currentBid,
             minIncrement: liveAuctionState.minIncrement,
@@ -61,7 +59,7 @@ export function getAuction(
       if (auctionId === 'sample-unsold') {
         resolve(
           baseDetail('sample-unsold', {
-            title: 'Collectible Card — Closed, no bids (mock)',
+            title: 'Collectible Card — closed, no bids (sample)',
             status: 'CLOSED',
             currentBid: 0,
             minIncrement: 1,
@@ -78,7 +76,7 @@ export function getAuction(
       if (auctionId === 'sample-sold') {
         resolve(
           baseDetail('sample-sold', {
-            title: 'Rare Watch — Sold, unpaid order (mock)',
+            title: 'Rare Watch — sold, awaiting payment (sample)',
             status: 'CLOSED',
             currentBid: 450,
             minIncrement: 1,
@@ -185,7 +183,7 @@ export function getUnpaidOrder(orderId: string): Promise<UnpaidOrder | null> {
       resolve({
         id: 'ord-sample-1',
         auctionId: 'sample-sold',
-        title: 'Rare Watch — Sold, unpaid order (mock)',
+        title: 'Rare Watch — sold, awaiting payment (sample)',
         amountDue: 450,
         currency: MOCK_CURRENCY,
         status: 'UNPAID',

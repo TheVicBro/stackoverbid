@@ -141,11 +141,12 @@ export function AuctionDetailPage() {
         <span className="text-gray-600 truncate">{auction.title}</span>
       </div>
 
-      <div className="rounded-lg border border-dashed border-gray-300 bg-white/80 px-3 py-2 text-xs text-gray-600">
-        <strong className="text-gray-800">Preview mode:</strong> append{' '}
-        <code className="bg-stone-100 px-1 rounded">?as=seller</code> to this URL to see the seller view for closed
-        auctions (UC4).
-      </div>
+      {auction.viewerIsSeller && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50/90 px-3 py-2 text-xs text-amber-950">
+          You are viewing this listing as the <strong>seller</strong>. Bidders see the standard auction page without this
+          notice.
+        </div>
+      )}
 
       <Card>
         <CardHeader>
@@ -239,7 +240,7 @@ export function AuctionDetailPage() {
               <div className="rounded-lg bg-stone-50 border border-stone-100 p-3">
                 <p className="text-gray-500 text-xs font-medium uppercase">Time left</p>
                 <p className="text-xl font-semibold text-gray-900">{timeLeft(auction.endsAt)}</p>
-                <p className="text-xs text-gray-400 mt-1">Polling every 5s — swap for WebSocket when backend is ready.</p>
+                <p className="text-xs text-gray-400 mt-1">Updates every few seconds.</p>
               </div>
             </div>
           )}
@@ -253,7 +254,8 @@ export function AuctionDetailPage() {
                   Place a bid
                 </h3>
                 <p className="text-xs text-gray-500 mt-1">
-                  Matches UC3: validate active auction, minimum increment, success and error surfaces.
+                  Enter at least the minimum next bid. You will see a confirmation or an error if the auction has moved
+                  on.
                 </p>
                 <form onSubmit={handlePlaceBid} className="mt-4 flex flex-col sm:flex-row gap-3 sm:items-end">
                   <div className="flex-1 space-y-1.5">
@@ -299,7 +301,7 @@ export function AuctionDetailPage() {
                     className="mt-4 flex gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900"
                   >
                     <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" />
-                    <span>Bid placed successfully. The listing will refresh for everyone after your backend broadcasts updates.</span>
+                    <span>Bid placed successfully. The page will refresh with the latest amounts.</span>
                   </div>
                 )}
               </div>
@@ -325,11 +327,14 @@ function ClosedAuctionSection({ auction }: { auction: AuctionDetail }) {
   if (auction.viewerIsSeller) {
     return (
       <div className="space-y-3">
-        <h3 className="text-sm font-semibold text-gray-900">Seller view (UC4)</h3>
+        <h3 className="text-sm font-semibold text-gray-900">Your listing</h3>
         {isUnsold && (
           <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
-            This item did not receive any bids before the auction ended. You can relist it from your dashboard when that
-            flow exists.
+            This item did not receive any bids before the auction ended. You can{' '}
+            <Link to="/sell" className="font-medium text-amber-900 underline hover:text-orange-700">
+              create a new listing
+            </Link>{' '}
+            anytime.
           </div>
         )}
         {isSold && !auction.isPaid && (
