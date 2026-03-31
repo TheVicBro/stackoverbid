@@ -4,9 +4,59 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { useState, useEffect } from 'react'
+import Authentication from './authentication'
 
 
 function App() {
+
+  const [showAuth, setShowAuth] = useState<false | "login" | "signup">(false)
+  const [loadingAuth, setLoadingAuth] = useState(true)
+  const [user, setUser] = useState<{username: string, first_name: string} | null>(null)
+  
+  const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "/api"
+
+  useEffect(() => {
+    fetch(`${API_BASE}/auth/me`, { credentials: "include" })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => setUser(data))
+      .catch((e) => console.error("Auth check failed:", e))
+      .finally(() => setLoadingAuth(false))
+  }, [API_BASE])
+
+  async function handleLogout() {
+    await fetch(`${API_BASE}/auth/logout`, { method: "POST", credentials: "include" })
+    setUser(null)
+    setShowAuth(false)
+  }
+
+  if (loadingAuth) {
+    return (
+      <div className="min-h-screen bg-stone-100 flex items-center justify-center text-gray-500">
+        <p>Loading StackOverbid...</p>
+      </div>
+    )
+  }
+
+  if (showAuth) {
+    return (
+      <Authentication
+        initialMode={showAuth === "signup" ? "signup" : "login"}
+        onAuthed={() => {
+          // Fetch user data after successful authentication
+          fetch(`${API_BASE}/auth/me`, { credentials: "include" })
+            .then(res => res.json())
+            .then(data => {
+              setUser(data)
+              setShowAuth(false)
+            })
+            .catch(() => setShowAuth(false))
+        }}
+        onCancel={() => setShowAuth(false)}
+      />
+    )
+  }
+
   return (
     <div className="min-h-screen bg-stone-100 text-gray-900 flex flex-col">
       {/* Top Nav */}
@@ -40,20 +90,38 @@ function App() {
           </div>
 
           {/* Right Actions — right-aligned */}
-          <div className="flex items-center gap-1 shrink-0 justify-self-end">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-300 hover:text-white hover:bg-gray-800 whitespace-nowrap"
-            >
-              Sign In
-            </Button>
-            <Button
-              size="sm"
-              className="bg-orange-500 text-white hover:bg-orange-400 whitespace-nowrap font-semibold"
-            >
-              Register
-            </Button>
+          <div className="flex items-center gap-2 shrink-0 justify-self-end">
+            {user ? (
+              <>
+                <span className="hidden sm:inline text-sm text-gray-300 font-medium mr-2">Hello, {user.first_name}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-300 hover:text-white hover:bg-gray-800 whitespace-nowrap"
+                  onClick={handleLogout}
+                >
+                  Log Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-300 hover:text-white hover:bg-gray-800 whitespace-nowrap"
+                  onClick={() => setShowAuth("login")}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-orange-500 text-white hover:bg-orange-400 whitespace-nowrap font-semibold"
+                  onClick={() => setShowAuth("signup")}
+                >
+                  Register
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </nav>
