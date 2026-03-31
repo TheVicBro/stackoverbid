@@ -8,12 +8,14 @@ import { UnpaidOrderPage } from '@/pages/UnpaidOrderPage'
 import { CreateAuctionPage } from '@/pages/CreateAuctionPage'
 import { ProfilePage } from '@/pages/ProfilePage'
 import { MyAuctionsPage } from '@/pages/MyAuctionsPage'
+import { SearchPage } from '@/pages/SearchPage'
 
 function App() {
   return (
     <Routes>
       <Route element={<MarketplaceLayout />}>
         <Route index element={<HomePage />} />
+        <Route path="search" element={<SearchPage />} />
         <Route path="my/auctions" element={<MyAuctionsPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="sell" element={<CreateAuctionPage />} />

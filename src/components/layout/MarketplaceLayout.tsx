@@ -1,4 +1,4 @@
-import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { Link, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { Gavel } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -8,8 +8,42 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { NotificationMenu } from '@/components/notifications/NotificationMenu'
 import Authentication from '@/authentication'
 
+const NAV_CATEGORIES = [
+  'All',
+  'Electronics',
+  'Fashion',
+  'Collectibles',
+  'Home & Garden',
+  'Sports',
+  'Art',
+  'Vehicles',
+  'Jewelry',
+] as const
+
 export function MarketplaceLayout() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const [searchParams] = useSearchParams()
+  const [searchDraft, setSearchDraft] = useState('')
+
+  const qInUrl = (searchParams.get('q') ?? '').trim()
+
+  useEffect(() => {
+    if (location.pathname === '/search') {
+      setSearchDraft(searchParams.get('q') ?? '')
+    }
+  }, [location.pathname, searchParams])
+
+  function submitSearch(e: React.FormEvent) {
+    e.preventDefault()
+    const t = searchDraft.trim()
+    if (!t) {
+      navigate('/')
+      return
+    }
+    navigate(`/search?q=${encodeURIComponent(t)}`)
+  }
+
   const [showAuth, setShowAuth] = useState<false | "login" | "signup">(false)
   const [loadingAuth, setLoadingAuth] = useState(true)
   const [user, setUser] = useState<{id: number, username: string, first_name: string, last_name: string} | null>(null)
@@ -93,17 +127,22 @@ export function MarketplaceLayout() {
           </Link>
 
           <div className="w-full max-w-2xl justify-self-center">
-            <div className="flex">
+            <form className="flex" onSubmit={submitSearch}>
               <Input
-                type="text"
-                placeholder="Search for anything..."
+                type="search"
+                name="q"
+                autoComplete="off"
+                placeholder="Search listings by title..."
+                value={searchDraft}
+                onChange={(e) => setSearchDraft(e.target.value)}
                 className="h-9 rounded-r-none border-none bg-white placeholder:text-gray-400 text-gray-900 shadow-none focus-visible:ring-0"
               />
               <Button
+                type="submit"
                 size="sm"
-                className="h-9 px-5 bg-orange-500 hover:bg-orange-400 rounded-l-none shrink-0"
+                className="h-9 px-5 bg-orange-500 hover:bg-orange-400 rounded-l-none shrink-0 cursor-pointer"
               >
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -111,8 +150,9 @@ export function MarketplaceLayout() {
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                   />
                 </svg>
+                <span className="sr-only">Search</span>
               </Button>
-            </div>
+            </form>
           </div>
 
           <div className="flex items-center gap-2 shrink-0 justify-self-end">
@@ -250,21 +290,24 @@ export function MarketplaceLayout() {
       <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center gap-1 overflow-x-auto py-2 text-sm font-medium no-scrollbar mr-4">
-            {['All', 'Electronics', 'Fashion', 'Collectibles', 'Home & Garden', 'Sports', 'Art', 'Vehicles', 'Jewelry'].map(
-              (cat, i) => (
-                <a
+            {NAV_CATEGORIES.map((cat) => {
+              const isAll = cat === 'All'
+              const to = isAll ? '/' : `/search?q=${encodeURIComponent(cat)}`
+              const active = isAll
+                ? location.pathname === '/'
+                : location.pathname === '/search' && qInUrl.toLowerCase() === cat.toLowerCase()
+              return (
+                <Link
                   key={cat}
-                  href="#"
-                  className={`shrink-0 px-3.5 py-1.5 rounded-full transition-all ${
-                    i === 0
-                      ? 'bg-gray-900 text-white'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  to={to}
+                  className={`shrink-0 px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
+                    active ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                   }`}
                 >
                   {cat}
-                </a>
+                </Link>
               )
-            )}
+            })}
           </div>
           {user ? (
             <Link 
