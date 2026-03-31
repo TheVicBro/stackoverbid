@@ -45,14 +45,14 @@ function getErrorMessage(err: unknown) {
   return "Request failed"
 }
 
-export default function Authentication(props: { onAuthed?: () => void, onCancel?: () => void }) {
+export default function Authentication(props: { onAuthed?: () => void, onCancel?: () => void, initialMode?: "login" | "signup" }) {
   
   const API_BASE = useMemo(() => {
     return (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "/api"
   }, [])
 
   // Login or sign up mode
-  const [mode, setMode] = useState<"login" | "signup">("login")
+  const [mode, setMode] = useState<"login" | "signup">(props.initialMode ?? "login")
   const [loading, setLoading] = useState(false)
 
   // Error and success

@@ -10,9 +10,9 @@ import Authentication from './authentication'
 
 function App() {
 
-  const [showAuth, setShowAuth] = useState(false)
+  const [showAuth, setShowAuth] = useState<false | "login" | "signup">(false)
   const [loadingAuth, setLoadingAuth] = useState(true)
-  const [user, setUser] = useState<{username: string} | null>(null)
+  const [user, setUser] = useState<{username: string, first_name: string} | null>(null)
   
   const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "/api"
 
@@ -41,6 +41,7 @@ function App() {
   if (showAuth) {
     return (
       <Authentication
+        initialMode={showAuth === "signup" ? "signup" : "login"}
         onAuthed={() => {
           // Fetch user data after successful authentication
           fetch(`${API_BASE}/auth/me`)
@@ -92,7 +93,7 @@ function App() {
           <div className="flex items-center gap-2 shrink-0 justify-self-end">
             {user ? (
               <>
-                <span className="hidden sm:inline text-sm text-gray-300 font-medium mr-2">Hello, {user.username}</span>
+                <span className="hidden sm:inline text-sm text-gray-300 font-medium mr-2">Hello, {user.first_name}</span>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -108,14 +109,14 @@ function App() {
                   variant="ghost"
                   size="sm"
                   className="text-gray-300 hover:text-white hover:bg-gray-800 whitespace-nowrap"
-                  onClick={() => setShowAuth(true)}
+                  onClick={() => setShowAuth("login")}
                 >
                   Sign In
                 </Button>
                 <Button
                   size="sm"
                   className="bg-orange-500 text-white hover:bg-orange-400 whitespace-nowrap font-semibold"
-                  onClick={() => setShowAuth(true)}
+                  onClick={() => setShowAuth("signup")}
                 >
                   Register
                 </Button>
