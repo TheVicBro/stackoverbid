@@ -189,11 +189,17 @@ export function AuctionDetailPage() {
             </div>
             <div className="flex flex-wrap gap-2 justify-end">
               {auction.status === 'LIVE' ? (
-                <Badge className="bg-emerald-600 hover:bg-emerald-600">Live</Badge>
+                <Badge className="border-transparent bg-emerald-600 text-white hover:bg-emerald-600 dark:bg-emerald-600 dark:text-white">
+                  Live
+                </Badge>
               ) : (
                 <Badge variant="secondary">Closed</Badge>
               )}
-              {auction.outcome === 'SOLD' && <Badge className="bg-orange-500 hover:bg-orange-500">Sold</Badge>}
+              {auction.outcome === 'SOLD' && (
+                <Badge className="border-transparent bg-orange-500 text-white hover:bg-orange-500 dark:text-white">
+                  Sold
+                </Badge>
+              )}
               {auction.outcome === 'UNSOLD' && (
                 <Badge
                   variant="outline"
@@ -292,9 +298,15 @@ export function AuctionDetailPage() {
                   Enter at least the minimum next bid. You will see a confirmation or an error if the auction has moved
                   on.
                 </p>
-                <form onSubmit={handlePlaceBid} className="mt-4 flex flex-col sm:flex-row gap-3 sm:items-end">
-                  <div className="flex-1 space-y-1.5">
-                    <label htmlFor="bid" className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                <form
+                  onSubmit={handlePlaceBid}
+                  className="mt-4 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:gap-x-6 sm:gap-y-3"
+                >
+                  <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                    <label
+                      htmlFor="bid"
+                      className="text-xs font-medium leading-snug text-gray-700 dark:text-gray-300 sm:max-w-[min(100%,14rem)] sm:shrink-0"
+                    >
                       Your bid ({formatMoney(minNextBid)} or higher)
                     </label>
                     <Input
@@ -309,13 +321,13 @@ export function AuctionDetailPage() {
                         setBidInput(e.target.value)
                         setBidError(null)
                       }}
-                      className="max-w-xs"
+                      className="w-full min-w-[8rem] sm:max-w-xs sm:flex-1"
                     />
                   </div>
                   <Button
                     type="submit"
                     disabled={bidSubmitting}
-                    className="bg-orange-500 hover:bg-orange-400 text-white font-semibold shrink-0"
+                    className="bg-orange-500 hover:bg-orange-400 w-full text-white font-semibold shrink-0 sm:w-auto"
                   >
                     {bidSubmitting ? 'Placing…' : 'Place bid'}
                   </Button>
