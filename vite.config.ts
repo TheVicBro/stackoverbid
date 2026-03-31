@@ -12,13 +12,12 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    // Forward to fastAPI to connect to backend during local dev.
     proxy: {
-      // Forward to fastAPI to connect to backend.
       "/api": {
         target: "http://localhost:8000",
         changeOrigin: true,
         secure: false,
-
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
