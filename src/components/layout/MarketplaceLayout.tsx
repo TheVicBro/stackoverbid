@@ -1,4 +1,4 @@
-import { Link, Outlet } from 'react-router-dom'
+import { Link, Outlet, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,6 +8,7 @@ import { NotificationMenu } from '@/components/notifications/NotificationMenu'
 import Authentication from '@/authentication'
 
 export function MarketplaceLayout() {
+  const navigate = useNavigate()
   const [showAuth, setShowAuth] = useState<false | "login" | "signup">(false)
   const [loadingAuth, setLoadingAuth] = useState(true)
   const [user, setUser] = useState<{id: number, username: string, first_name: string, last_name: string} | null>(null)
@@ -143,7 +144,22 @@ export function MarketplaceLayout() {
                       </div>
                     </div>
                     {/* Actions */}
-                    <div className="py-2 px-2 border-b border-gray-100">
+                    <div className="py-2 px-2 border-b border-gray-100 space-y-0.5">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full justify-start text-gray-700 hover:text-orange-600 hover:bg-orange-50 gap-2"
+                        onClick={() => {
+                          setProfileOpen(false)
+                          navigate('/profile')
+                        }}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                          <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        Profile & address
+                      </Button>
                       <Button variant="ghost" size="sm" className="w-full justify-start text-gray-700 hover:text-orange-600 hover:bg-orange-50 gap-2" asChild onClick={() => setProfileOpen(false)}>
                         <Link to="/sell">
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>

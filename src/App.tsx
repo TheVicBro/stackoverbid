@@ -6,12 +6,14 @@ import { CheckoutPage } from '@/pages/CheckoutPage'
 import { HomePage } from '@/pages/HomePage'
 import { UnpaidOrderPage } from '@/pages/UnpaidOrderPage'
 import { CreateAuctionPage } from '@/pages/CreateAuctionPage'
+import { ProfilePage } from '@/pages/ProfilePage'
 
 function App() {
   return (
     <Routes>
       <Route element={<MarketplaceLayout />}>
         <Route index element={<HomePage />} />
+        <Route path="profile" element={<ProfilePage />} />
         <Route path="sell" element={<CreateAuctionPage />} />
         <Route path="auctions/:auctionId" element={<AuctionDetailPage />} />
         <Route path="checkout/:auctionId" element={<CheckoutPage />} />

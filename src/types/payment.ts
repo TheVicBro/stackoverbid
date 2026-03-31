@@ -8,6 +8,8 @@ export interface CheckoutDTO {
   currency: string
   /** From profile or placeholder — backend uses profile address if pay request omits override. */
   shippingAddressSummary: string
+  /** False when profile has no usable shipping address (user should fill profile before paying). */
+  hasShippingAddress: boolean
 }
 
 /** Receipt from POST /payment/items/{id}/pay or GET /payment/orders/{id}/receipt (UC5–UC6). */

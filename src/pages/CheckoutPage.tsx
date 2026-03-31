@@ -272,6 +272,15 @@ export function CheckoutPage() {
             <p className="text-xs text-gray-500 pt-1">
               Ship to: {checkout.shippingAddressSummary}
             </p>
+            {!checkout.hasShippingAddress && (
+              <p className="text-xs text-amber-900 pt-2 border-t border-amber-200/80 mt-2">
+                Add a shipping address in your{' '}
+                <Link to="/profile" className="font-semibold text-orange-700 hover:text-orange-800 underline">
+                  profile
+                </Link>{' '}
+                before paying.
+              </p>
+            )}
           </div>
 
           <div className="flex gap-2 rounded-md border border-blue-100 bg-blue-50/80 px-3 py-2 text-xs text-blue-950">

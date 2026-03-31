@@ -132,6 +132,7 @@ export async function getCheckoutPage(
   }
 
   const addr = me.address?.trim() ?? ''
+  const hasShippingAddress = addr.length > 0
 
   return {
     ok: true,
@@ -143,6 +144,7 @@ export async function getCheckoutPage(
       currency: 'USD',
       shippingAddressSummary:
         addr || 'Add an address in your profile before paying (required for shipping).',
+      hasShippingAddress,
     },
   }
 }
