@@ -114,38 +114,70 @@ export function getAuction(
   })
 }
 
-export function placeBid(auctionId: string, amount: number): Promise<PlaceBidResult> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      if (!Number.isFinite(amount) || amount <= 0) {
-        resolve({ ok: false, error: 'BID_TOO_LOW', message: 'Enter a valid positive bid amount.' })
-        return
-      }
+const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api'
 
-      if (auctionId !== 'sample-live') {
-        resolve({ ok: false, error: 'AUCTION_CLOSED', message: 'This auction is closed.' })
-        return
-      }
+function fastApiDetailMessage(data: unknown): string {
+  if (!data || typeof data !== 'object') return ''
+  const d = (data as { detail?: unknown }).detail
+  if (typeof d === 'string') return d
+  if (Array.isArray(d) && d[0] && typeof d[0] === 'object' && 'msg' in d[0]) {
+    return String((d[0] as { msg: string }).msg)
+  }
+  return ''
+}
 
-      const minNext = liveAuctionState.currentBid + liveAuctionState.minIncrement
-      if (amount < minNext) {
-        resolve({
-          ok: false,
-          error: 'BID_TOO_LOW',
-          message: `Your bid must be at least $${minNext.toFixed(2)}.`,
-        })
-        return
-      }
+export async function placeBid(auctionId: string, amount: number): Promise<PlaceBidResult> {
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return { ok: false, error: 'BID_TOO_LOW', message: 'Enter a valid positive bid amount.' }
+  }
 
-      liveAuctionState = {
-        ...liveAuctionState,
-        currentBid: amount,
-        bidCount: liveAuctionState.bidCount + 1,
-      }
+  const itemId = parseInt(auctionId, 10)
+  if (!Number.isFinite(itemId) || String(itemId) !== auctionId.trim()) {
+    return { ok: false, error: 'AUCTION_CLOSED', message: 'Invalid auction.' }
+  }
 
-      resolve({ ok: true })
-    }, 350)
+  const res = await fetch(`${API_BASE}/auction/items/${itemId}/bid`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ amount }),
   })
+
+  if (res.ok) {
+    return { ok: true }
+  }
+
+  const data = await res.json().catch(() => ({}))
+  const detail = fastApiDetailMessage(data) || 'Could not place bid.'
+
+  if (res.status === 401) {
+    return { ok: false, message: 'You must be signed in to place a bid.' }
+  }
+
+  if (res.status === 404) {
+    return { ok: false, message: detail }
+  }
+
+  if (res.status === 403) {
+    return { ok: false, message: detail }
+  }
+
+  if (res.status === 422) {
+    return { ok: false, error: 'BID_TOO_LOW', message: detail }
+  }
+
+  if (res.status === 400) {
+    const lower = detail.toLowerCase()
+    if (lower.includes('auction is closed') || lower.includes('auction has expired')) {
+      return { ok: false, error: 'AUCTION_CLOSED', message: detail }
+    }
+    if (lower.includes('bid must be greater') || lower.includes('current price')) {
+      return { ok: false, error: 'BID_TOO_LOW', message: detail }
+    }
+    return { ok: false, message: detail }
+  }
+
+  return { ok: false, message: detail }
 }
 
 export function getUnpaidOrder(orderId: string): Promise<UnpaidOrder | null> {

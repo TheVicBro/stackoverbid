@@ -91,7 +91,7 @@ export function AuctionDetailPage() {
         setBidError(result.message ?? 'Your bid is too low.')
         return
       }
-      setBidError('Could not place bid.')
+      setBidError(result.message ?? 'Could not place bid.')
       return
     }
     setBidSuccess(true)
