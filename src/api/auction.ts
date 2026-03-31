@@ -28,6 +28,7 @@ function baseDetail(
     id,
     description:
       'This is placeholder copy. Replace with catalogue data from your API when integrated.',
+    imageUrls: [],
     currentBid: 0,
     minIncrement: 1,
     bidCount: 0,

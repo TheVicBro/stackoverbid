@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { AlertCircle, CheckCircle2, Gavel, Trophy } from 'lucide-react'
 import { placeBid } from '@/api/auction'
@@ -50,6 +50,19 @@ export function AuctionDetailPage() {
     if (!auction || auction.status !== 'LIVE') return 0
     return auction.currentBid + auction.minIncrement
   }, [auction])
+
+  const gallery = auction?.imageUrls ?? []
+  const [activeImageIndex, setActiveImageIndex] = useState(0)
+  useEffect(() => {
+    setActiveImageIndex(0)
+  }, [auction?.id, gallery.length])
+
+  const showPrev = useCallback(() => {
+    setActiveImageIndex((i) => (gallery.length ? (i - 1 + gallery.length) % gallery.length : 0))
+  }, [gallery.length])
+  const showNext = useCallback(() => {
+    setActiveImageIndex((i) => (gallery.length ? (i + 1) % gallery.length : 0))
+  }, [gallery.length])
 
   async function handlePlaceBid(e: React.FormEvent) {
     e.preventDefault()
@@ -157,7 +170,61 @@ export function AuctionDetailPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="aspect-video rounded-lg bg-stone-200 border border-stone-100" />
+          {gallery.length > 0 ? (
+            <div className="space-y-2">
+              <div className="relative aspect-video rounded-lg overflow-hidden bg-stone-100 border border-stone-200">
+                <img
+                  src={gallery[activeImageIndex]}
+                  alt=""
+                  className="h-full w-full object-contain bg-stone-50"
+                />
+                {gallery.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={showPrev}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-gray-900/60 text-white p-2 hover:bg-gray-900/80 text-sm font-medium"
+                      aria-label="Previous image"
+                    >
+                      ‹
+                    </button>
+                    <button
+                      type="button"
+                      onClick={showNext}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-gray-900/60 text-white p-2 hover:bg-gray-900/80 text-sm font-medium"
+                      aria-label="Next image"
+                    >
+                      ›
+                    </button>
+                    <span className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-gray-900/55 text-white text-xs px-2 py-0.5 tabular-nums">
+                      {activeImageIndex + 1} / {gallery.length}
+                    </span>
+                  </>
+                )}
+              </div>
+              {gallery.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {gallery.map((url, i) => (
+                    <button
+                      key={`${url}-${i}`}
+                      type="button"
+                      onClick={() => setActiveImageIndex(i)}
+                      className={cn(
+                        'shrink-0 h-16 w-16 rounded-md overflow-hidden border-2 transition-colors',
+                        i === activeImageIndex ? 'border-orange-500 ring-1 ring-orange-200' : 'border-transparent opacity-80 hover:opacity-100'
+                      )}
+                    >
+                      <img src={url} alt="" className="h-full w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="aspect-video rounded-lg bg-stone-200 border border-stone-100 flex items-center justify-center text-stone-400 text-sm">
+              No photos for this listing
+            </div>
+          )}
 
           {auction.status === 'LIVE' && (
             <div className="grid sm:grid-cols-3 gap-4 text-sm">

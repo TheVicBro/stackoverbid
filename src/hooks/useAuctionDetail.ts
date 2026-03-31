@@ -9,10 +9,14 @@ async function fetchAuction(auctionId: string): Promise<AuctionDetail> {
   })
   if (!res.ok) throw new Error('Could not load this auction.')
   const item = await res.json()
+  const rawUrls = item.image_urls
+  const imageUrls = Array.isArray(rawUrls) ? rawUrls.filter((u: unknown) => typeof u === 'string') : []
+
   return {
     id: String(item.id),
     title: item.title,
     description: item.description,
+    imageUrls,
     currentBid: item.current_price,
     minIncrement: 1,
     bidCount: 0,

@@ -12,6 +12,7 @@ interface AuctionItem {
   current_price: number
   end_time: string
   status: string
+  image_urls?: string[]
 }
 
 function timeLeft(endsAt: string) {
@@ -31,13 +32,18 @@ function isEndingSoon(endsAt: string) {
 }
 
 function AuctionCard({ item }: { item: AuctionItem }) {
+  const thumb = item.image_urls?.find((u) => typeof u === 'string' && u.length > 0)
   return (
     <Link to={`/auctions/${item.id}`} className="group">
       <Card className="overflow-hidden p-0 gap-0 hover:shadow-md hover:border-orange-200 transition-all duration-200 h-full">
-        <div className="aspect-square bg-gradient-to-br from-stone-100 to-stone-200 flex items-center justify-center">
-          <svg className="w-10 h-10 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
+        <div className="aspect-square bg-gradient-to-br from-stone-100 to-stone-200 flex items-center justify-center overflow-hidden">
+          {thumb ? (
+            <img src={thumb} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <svg className="w-10 h-10 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          )}
         </div>
         <CardContent className="p-3">
           <h3 className="text-sm font-medium text-gray-900 truncate group-hover:text-orange-600 transition-colors">

@@ -210,13 +210,23 @@ export function MarketplaceLayout() {
               )
             )}
           </div>
-          <Link 
-            to="/sell"
-            className="hidden sm:flex shrink-0 items-center gap-1.5 bg-orange-500 text-white hover:bg-orange-600 font-semibold text-sm px-4 py-1.5 rounded-full transition-colors shadow-sm"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-            Sell
-          </Link>
+          {user ? (
+            <Link 
+              to="/sell"
+              className="hidden sm:flex shrink-0 items-center gap-1.5 bg-orange-500 text-white hover:bg-orange-600 font-semibold text-sm px-4 py-1.5 rounded-full transition-colors shadow-sm"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              Sell
+            </Link>
+          ) : (
+            <button
+              onClick={() => setShowAuth("login")}
+              className="hidden sm:flex shrink-0 items-center gap-1.5 bg-orange-500 text-white hover:bg-orange-600 font-semibold text-sm px-4 py-1.5 rounded-full transition-colors shadow-sm cursor-pointer"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              Sell
+            </button>
+          )}
         </div>
       </div>
 
@@ -228,9 +238,18 @@ export function MarketplaceLayout() {
             <h3 className="text-lg font-bold text-white">Have something to sell?</h3>
             <p className="text-sm text-gray-400">List your item and reach thousands of bidders.</p>
           </div>
-          <Button className="bg-orange-500 text-white hover:bg-orange-400 font-semibold shrink-0" asChild>
-            <Link to="/sell">Start Selling</Link>
-          </Button>
+          {user ? (
+            <Button className="bg-orange-500 text-white hover:bg-orange-400 font-semibold shrink-0" asChild>
+              <Link to="/sell">Start Selling</Link>
+            </Button>
+          ) : (
+            <button
+              onClick={() => setShowAuth("login")}
+              className="bg-orange-500 text-white hover:bg-orange-400 font-semibold shrink-0 px-4 py-2 rounded-md text-sm cursor-pointer transition-colors"
+            >
+              Start Selling
+            </button>
+          )}
         </div>
       </div>
 

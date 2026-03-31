@@ -6,6 +6,8 @@ export interface AuctionDetail {
   id: string
   title: string
   description: string
+  /** Public image URLs from listing (e.g. Cloudinary) */
+  imageUrls: string[]
   status: AuctionStatus
   /** Current highest bid in major currency units (e.g. USD) */
   currentBid: number
