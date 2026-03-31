@@ -1,7 +1,62 @@
 import './App.css'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import { useState, useEffect } from 'react'
+import Authentication from './authentication'
+
 
 function App() {
+
+  const [showAuth, setShowAuth] = useState<false | "login" | "signup">(false)
+  const [loadingAuth, setLoadingAuth] = useState(true)
+  const [user, setUser] = useState<{username: string, first_name: string} | null>(null)
+  
+  const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "/api"
+
+  useEffect(() => {
+    fetch(`${API_BASE}/auth/me`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => setUser(data))
+      .catch((e) => console.error("Auth check failed:", e))
+      .finally(() => setLoadingAuth(false))
+  }, [API_BASE])
+
+  async function handleLogout() {
+    await fetch(`${API_BASE}/auth/logout`, { method: "POST" })
+    setUser(null)
+    setShowAuth(false)
+  }
+
+  if (loadingAuth) {
+    return (
+      <div className="min-h-screen bg-stone-100 flex items-center justify-center text-gray-500">
+        <p>Loading StackOverbid...</p>
+      </div>
+    )
+  }
+
+  if (showAuth) {
+    return (
+      <Authentication
+        initialMode={showAuth === "signup" ? "signup" : "login"}
+        onAuthed={() => {
+          // Fetch user data after successful authentication
+          fetch(`${API_BASE}/auth/me`)
+            .then(res => res.json())
+            .then(data => {
+              setUser(data)
+              setShowAuth(false)
+            })
+            .catch(() => setShowAuth(false))
+        }}
+        onCancel={() => setShowAuth(false)}
+      />
+    )
+  }
+
   return (
     <div className="min-h-screen bg-stone-100 text-gray-900 flex flex-col">
       {/* Top Nav */}
@@ -18,34 +73,55 @@ function App() {
           {/* Search Bar — centered */}
           <div className="w-full max-w-2xl justify-self-center">
             <div className="flex">
-              <input
+              <Input
                 type="text"
                 placeholder="Search for anything..."
-                className="w-full h-9 px-4 text-sm bg-white rounded-l-md border-none outline-none placeholder-gray-400 text-gray-900"
+                className="h-9 rounded-r-none border-none bg-white placeholder:text-gray-400 text-gray-900 shadow-none focus-visible:ring-0"
               />
-              <button className="h-9 px-5 bg-orange-500 hover:bg-orange-400 transition-colors rounded-r-md shrink-0">
+              <Button
+                size="sm"
+                className="h-9 px-5 bg-orange-500 hover:bg-orange-400 rounded-l-none shrink-0"
+              >
                 <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-              </button>
+              </Button>
             </div>
           </div>
 
           {/* Right Actions — right-aligned */}
-          <div className="flex items-center gap-1 shrink-0 justify-self-end">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-300 hover:text-white hover:bg-gray-800 whitespace-nowrap"
-            >
-              Sign In
-            </Button>
-            <Button
-              size="sm"
-              className="bg-orange-500 text-white hover:bg-orange-400 whitespace-nowrap font-semibold"
-            >
-              Register
-            </Button>
+          <div className="flex items-center gap-2 shrink-0 justify-self-end">
+            {user ? (
+              <>
+                <span className="hidden sm:inline text-sm text-gray-300 font-medium mr-2">Hello, {user.first_name}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-300 hover:text-white hover:bg-gray-800 whitespace-nowrap"
+                  onClick={handleLogout}
+                >
+                  Log Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-300 hover:text-white hover:bg-gray-800 whitespace-nowrap"
+                  onClick={() => setShowAuth("login")}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-orange-500 text-white hover:bg-orange-400 whitespace-nowrap font-semibold"
+                  onClick={() => setShowAuth("signup")}
+                >
+                  Register
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -83,9 +159,9 @@ function App() {
             <h2 className="mt-2 text-2xl md:text-3xl font-bold text-white leading-snug">
               Bid on items you love — deals end soon
             </h2>
-            <button className="mt-5 px-6 py-2.5 bg-orange-500 text-white text-sm font-semibold rounded-lg hover:bg-orange-400 transition-colors">
+            <Button className="mt-5 bg-orange-500 text-white hover:bg-orange-400 font-semibold">
               Browse Auctions
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -99,22 +175,20 @@ function App() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {[1, 2, 3, 4, 5].map((i) => (
-              <a
-                key={i}
-                href="#"
-                className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md hover:border-orange-200 transition-all duration-200"
-              >
-                <div className="aspect-square bg-stone-100" />
-                <div className="p-3">
-                  <h3 className="text-sm font-medium text-gray-900 truncate group-hover:text-orange-600 transition-colors">
-                    Auction Item
-                  </h3>
-                  <p className="mt-1 text-base font-bold text-gray-900">$0.00</p>
-                  <div className="mt-1.5 flex items-center justify-between">
-                    <span className="text-xs text-gray-400">0 bids</span>
-                    <span className="text-xs font-medium text-red-500">2h 14m</span>
-                  </div>
-                </div>
+              <a key={i} href="#" className="group">
+                <Card className="overflow-hidden p-0 gap-0 hover:shadow-md hover:border-orange-200 transition-all duration-200">
+                  <div className="aspect-square bg-stone-100" />
+                  <CardContent className="p-3">
+                    <h3 className="text-sm font-medium text-gray-900 truncate group-hover:text-orange-600 transition-colors">
+                      Auction Item
+                    </h3>
+                    <p className="mt-1 text-base font-bold text-gray-900">$0.00</p>
+                    <div className="mt-1.5 flex items-center justify-between">
+                      <Badge variant="secondary" className="text-xs text-gray-400">0 bids</Badge>
+                      <Badge variant="destructive" className="text-xs">2h 14m</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
               </a>
             ))}
           </div>
@@ -130,22 +204,20 @@ function App() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {[1, 2, 3, 4, 5].map((i) => (
-              <a
-                key={i}
-                href="#"
-                className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md hover:border-orange-200 transition-all duration-200"
-              >
-                <div className="aspect-square bg-stone-100" />
-                <div className="p-3">
-                  <h3 className="text-sm font-medium text-gray-900 truncate group-hover:text-orange-600 transition-colors">
-                    Auction Item
-                  </h3>
-                  <p className="mt-1 text-base font-bold text-gray-900">$0.00</p>
-                  <div className="mt-1.5 flex items-center justify-between">
-                    <span className="text-xs text-gray-400">0 bids</span>
-                    <span className="text-xs font-medium text-orange-500">1d 6h</span>
-                  </div>
-                </div>
+              <a key={i} href="#" className="group">
+                <Card className="overflow-hidden p-0 gap-0 hover:shadow-md hover:border-orange-200 transition-all duration-200">
+                  <div className="aspect-square bg-stone-100" />
+                  <CardContent className="p-3">
+                    <h3 className="text-sm font-medium text-gray-900 truncate group-hover:text-orange-600 transition-colors">
+                      Auction Item
+                    </h3>
+                    <p className="mt-1 text-base font-bold text-gray-900">$0.00</p>
+                    <div className="mt-1.5 flex items-center justify-between">
+                      <Badge variant="secondary" className="text-xs text-gray-400">0 bids</Badge>
+                      <Badge variant="outline" className="text-xs text-orange-500 border-orange-200">1d 6h</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
               </a>
             ))}
           </div>
@@ -163,13 +235,11 @@ function App() {
               { name: 'Sports', icon: '⚽' },
               { name: 'Art', icon: '🎨' },
             ].map(({ name, icon }) => (
-              <a
-                key={name}
-                href="#"
-                className="flex items-center gap-3 bg-white p-4 rounded-lg border border-gray-200 hover:border-orange-300 hover:shadow-sm transition-all"
-              >
-                <span className="text-2xl">{icon}</span>
-                <span className="text-sm font-medium text-gray-700">{name}</span>
+              <a key={name} href="#">
+                <Card className="flex-row items-center gap-3 p-4 py-4 hover:border-orange-300 hover:shadow-sm transition-all">
+                  <span className="text-2xl">{icon}</span>
+                  <span className="text-sm font-medium text-gray-700">{name}</span>
+                </Card>
               </a>
             ))}
           </div>
@@ -185,22 +255,20 @@ function App() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {[1, 2, 3, 4, 5].map((i) => (
-              <a
-                key={i}
-                href="#"
-                className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md hover:border-orange-200 transition-all duration-200"
-              >
-                <div className="aspect-square bg-stone-100" />
-                <div className="p-3">
-                  <h3 className="text-sm font-medium text-gray-900 truncate group-hover:text-orange-600 transition-colors">
-                    Auction Item
-                  </h3>
-                  <p className="mt-1 text-base font-bold text-gray-900">$0.00</p>
-                  <div className="mt-1.5 flex items-center justify-between">
-                    <span className="text-xs text-gray-400">0 bids</span>
-                    <span className="text-xs font-medium text-gray-400">3d 12h</span>
-                  </div>
-                </div>
+              <a key={i} href="#" className="group">
+                <Card className="overflow-hidden p-0 gap-0 hover:shadow-md hover:border-orange-200 transition-all duration-200">
+                  <div className="aspect-square bg-stone-100" />
+                  <CardContent className="p-3">
+                    <h3 className="text-sm font-medium text-gray-900 truncate group-hover:text-orange-600 transition-colors">
+                      Auction Item
+                    </h3>
+                    <p className="mt-1 text-base font-bold text-gray-900">$0.00</p>
+                    <div className="mt-1.5 flex items-center justify-between">
+                      <Badge variant="secondary" className="text-xs text-gray-400">0 bids</Badge>
+                      <Badge variant="secondary" className="text-xs text-gray-400">3d 12h</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
               </a>
             ))}
           </div>
@@ -214,9 +282,9 @@ function App() {
             <h3 className="text-lg font-bold text-white">Have something to sell?</h3>
             <p className="text-sm text-gray-400">List your item and reach thousands of bidders.</p>
           </div>
-          <button className="px-6 py-2.5 bg-orange-500 text-white text-sm font-semibold rounded-lg hover:bg-orange-400 transition-colors shrink-0">
+          <Button className="bg-orange-500 text-white hover:bg-orange-400 font-semibold shrink-0">
             Start Selling
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -263,7 +331,8 @@ function App() {
               </ul>
             </div>
           </div>
-          <div className="mt-10 pt-6 border-t border-gray-800 text-center text-xs text-gray-600">
+          <Separator className="mt-10 bg-gray-800" />
+          <div className="pt-6 text-center text-xs text-gray-600">
             &copy; {new Date().getFullYear()} StackOverbid. All rights reserved.
           </div>
         </div>
