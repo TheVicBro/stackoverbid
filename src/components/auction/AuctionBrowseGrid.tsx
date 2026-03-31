@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import type { CatalogueListItem } from '@/api/catalogue'
+import { formatAppCurrency } from '@/lib/currency'
 import { parseUtcInstantMs } from '@/lib/utils'
 
 function timeLeft(endsAt: string) {
@@ -44,7 +45,7 @@ function AuctionCard({ item }: { item: CatalogueListItem }) {
           <h3 className="text-sm font-medium text-gray-900 truncate group-hover:text-orange-600 transition-colors">
             {item.title}
           </h3>
-          <p className="mt-1 text-base font-bold text-gray-900">${item.current_price.toFixed(2)}</p>
+          <p className="mt-1 text-base font-bold text-gray-900">{formatAppCurrency(item.current_price)}</p>
           <div className="mt-1.5">
             <Badge variant={isEndingSoon(item.end_time) ? 'destructive' : 'secondary'} className="text-xs">
               {timeLeft(item.end_time)}

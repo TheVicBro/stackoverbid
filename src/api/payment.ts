@@ -141,7 +141,7 @@ export async function getCheckoutPage(
       title: item.title,
       itemPrice: item.current_price,
       expeditedShippingFee: Math.max(0, Number(item.expedited_shipping_cost) || 0),
-      currency: 'USD',
+      currency: 'CAD',
       shippingAddressSummary:
         addr || 'Add an address in your profile before paying (required for shipping).',
       hasShippingAddress,

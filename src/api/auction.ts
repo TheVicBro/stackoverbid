@@ -12,7 +12,7 @@ let liveAuctionState = {
   endsAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
 }
 
-const MOCK_CURRENCY = 'USD'
+const MOCK_CURRENCY = 'CAD'
 
 function baseDetail(
   id: string,
@@ -22,6 +22,7 @@ function baseDetail(
     id,
     description: 'Sample listing description for offline demos.',
     imageUrls: [],
+    tags: [],
     currentBid: 0,
     startingPrice: 0,
     minIncrement: 1,
@@ -47,6 +48,7 @@ export function getAuction(
           baseDetail('sample-live', {
             title: 'Vintage Camera — live auction (sample)',
             status: 'LIVE',
+            tags: ['Electronics', 'Collectibles'],
             currentBid: liveAuctionState.currentBid,
             startingPrice: 100,
             minIncrement: liveAuctionState.minIncrement,

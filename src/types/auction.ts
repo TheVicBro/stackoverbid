@@ -8,8 +8,10 @@ export interface AuctionDetail {
   description: string
   /** Public image URLs from listing (e.g. Cloudinary) */
   imageUrls: string[]
+  /** Marketplace category tags (nav/search alignment). */
+  tags: string[]
   status: AuctionStatus
-  /** Current highest bid in major currency units (e.g. USD) */
+  /** Current highest bid in major currency units (CAD). */
   currentBid: number
   /** Starting price from listing — used with currentBid to infer bids when API omits count. */
   startingPrice: number

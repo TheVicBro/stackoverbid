@@ -9,9 +9,10 @@ import {
 } from '@/api/myAuctions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { formatAppCurrency } from '@/lib/currency'
 
 function formatMoney(n: number) {
-  return n.toLocaleString(undefined, { style: 'currency', currency: 'USD' })
+  return formatAppCurrency(n)
 }
 
 function BidRowList({ rows, empty }: { rows: MyBidRow[]; empty: string }) {

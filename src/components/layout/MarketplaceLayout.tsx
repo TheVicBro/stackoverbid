@@ -7,18 +7,9 @@ import { Separator } from '@/components/ui/separator'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { NotificationMenu } from '@/components/notifications/NotificationMenu'
 import Authentication from '@/authentication'
+import { MARKETPLACE_NAV_TAGS } from '@/constants/marketplaceCategories'
 
-const NAV_CATEGORIES = [
-  'All',
-  'Electronics',
-  'Fashion',
-  'Collectibles',
-  'Home & Garden',
-  'Sports',
-  'Art',
-  'Vehicles',
-  'Jewelry',
-] as const
+const NAV_CATEGORIES = ['All', ...MARKETPLACE_NAV_TAGS] as const
 
 export function MarketplaceLayout() {
   const navigate = useNavigate()
@@ -101,7 +92,7 @@ export function MarketplaceLayout() {
                 type="search"
                 name="q"
                 autoComplete="off"
-                placeholder="Search listings by title..."
+                placeholder="Search listings by title or description..."
                 value={searchDraft}
                 onChange={(e) => setSearchDraft(e.target.value)}
                 className="h-9 rounded-r-none border-none bg-white placeholder:text-gray-400 text-gray-900 shadow-none focus-visible:ring-0"

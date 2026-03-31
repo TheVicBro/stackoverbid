@@ -8,11 +8,12 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
+import { formatAppCurrency } from '@/lib/currency'
 import { cn, parseUtcInstantMs } from '@/lib/utils'
 import type { AuctionDetail } from '@/types/auction'
 
 function formatMoney(n: number) {
-  return n.toLocaleString(undefined, { style: 'currency', currency: 'USD' })
+  return formatAppCurrency(n)
 }
 
 function timeLeft(endsAt: string | null) {
@@ -172,6 +173,19 @@ export function AuctionDetailPage() {
             <div>
               <CardTitle className="text-xl">{auction.title}</CardTitle>
               <CardDescription className="mt-2 max-w-prose">{auction.description}</CardDescription>
+              {auction.tags.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {auction.tags.map((tag) => (
+                    <Link
+                      key={tag}
+                      to={`/search?q=${encodeURIComponent(tag)}`}
+                      className="text-xs font-medium rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1 text-stone-700 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-900 transition-colors"
+                    >
+                      {tag}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="flex flex-wrap gap-2 justify-end">
               {auction.status === 'LIVE' ? (

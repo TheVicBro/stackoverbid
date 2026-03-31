@@ -70,11 +70,11 @@ export function SearchPage() {
           <h1 className="text-2xl font-bold text-gray-900">{heading}</h1>
           {!q ? (
             <p className="text-sm text-gray-600 mt-1">
-              Use the search bar above or pick a category to find live auctions by title.
+              Use the search bar above or pick a category. Matches listing titles and descriptions.
             </p>
           ) : (
             <p className="text-sm text-gray-600 mt-1">
-              Showing live listings whose titles match your keywords.
+              Showing live listings whose title or description contains your search words.
             </p>
           )}
         </div>

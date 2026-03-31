@@ -6,12 +6,14 @@ import type { UnpaidOrder } from '@/types/auction'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { APP_CURRENCY } from '@/lib/currency'
 
 function formatMoney(n: number, currency: string) {
+  const code = currency || APP_CURRENCY
   try {
-    return new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(n)
+    return new Intl.NumberFormat('en-CA', { style: 'currency', currency: code }).format(n)
   } catch {
-    return `$${n.toFixed(2)}`
+    return `${n.toFixed(2)} ${code}`
   }
 }
 

@@ -17,6 +17,19 @@ async function fetchAuction(auctionId: string): Promise<AuctionDetail> {
   const rawUrls = item.image_urls
   const imageUrls = Array.isArray(rawUrls) ? rawUrls.filter((u: unknown) => typeof u === 'string') : []
 
+  const rawTags = item.tags
+  let tags: string[] = []
+  if (Array.isArray(rawTags)) {
+    tags = rawTags.filter((t): t is string => typeof t === 'string')
+  } else if (typeof rawTags === 'string') {
+    try {
+      const parsed = JSON.parse(rawTags) as unknown
+      if (Array.isArray(parsed)) tags = parsed.filter((t): t is string => typeof t === 'string')
+    } catch {
+      tags = []
+    }
+  }
+
   const backendStatus = item.status as string
   const endMs = parseUtcInstantMs(item.end_time as string)
   const endTimePassed = Number.isFinite(endMs) && endMs <= Date.now()
@@ -47,6 +60,7 @@ async function fetchAuction(auctionId: string): Promise<AuctionDetail> {
     title: item.title,
     description: item.description,
     imageUrls,
+    tags,
     currentBid: item.current_price,
     startingPrice: Number.isFinite(startingPrice) ? startingPrice : item.current_price,
     minIncrement: 1,

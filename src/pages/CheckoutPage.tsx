@@ -7,13 +7,14 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
+import { APP_CURRENCY } from '@/lib/currency'
 import { digitsOnlyMax, formatCardExpiryInput } from '@/lib/utils'
 
 function formatMoney(n: number, currency: string) {
   try {
-    return new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(n)
+    return new Intl.NumberFormat('en-CA', { style: 'currency', currency }).format(n)
   } catch {
-    return `$${n.toFixed(2)}`
+    return `${n.toFixed(2)} ${currency}`
   }
 }
 
@@ -166,7 +167,7 @@ export function CheckoutPage() {
             <div className="flex justify-between">
               <span className="text-gray-600">Amount paid</span>
               <span className="font-semibold tabular-nums text-gray-900">
-                {formatMoney(receipt.amountPaid, checkout?.currency ?? 'USD')}
+                {formatMoney(receipt.amountPaid, checkout?.currency ?? APP_CURRENCY)}
               </span>
             </div>
             <div className="flex justify-between gap-2 items-start">

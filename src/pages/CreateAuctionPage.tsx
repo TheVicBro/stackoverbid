@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { format } from 'date-fns'
-import { CalendarIcon, X, ImagePlus, Loader2 } from 'lucide-react'
+import { CalendarIcon, X, ImagePlus, Loader2, Sparkles } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { suggestListingDraft } from '@/api/tagSuggestion'
+import { MARKETPLACE_NAV_TAGS } from '@/constants/marketplaceCategories'
 import { cn } from '@/lib/utils'
 
 export function CreateAuctionPage() {
@@ -29,6 +31,10 @@ export function CreateAuctionPage() {
   const [uploadingImages, setUploadingImages] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [tagSuggesting, setTagSuggesting] = useState(false)
+  const [tagHint, setTagHint] = useState<string | null>(null)
 
   const CLOUD_NAME = (import.meta.env.VITE_CLOUDINARY_CLOUD_NAME as string | undefined)?.trim() ?? ''
   const UPLOAD_PRESET = (import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET as string | undefined)?.trim() ?? ''
@@ -97,6 +103,37 @@ export function CreateAuctionPage() {
     setImageUrls((prev) => prev.filter((_, i) => i !== index))
   }
 
+  function toggleTag(tag: string) {
+    setSelectedTags((prev) => {
+      if (prev.includes(tag)) return prev.filter((t) => t !== tag)
+      if (prev.length >= 5) return prev
+      return [...prev, tag]
+    })
+  }
+
+  async function runSuggestFromGemini() {
+    setTagSuggesting(true)
+    setError(null)
+    setTagHint(null)
+    const res = await suggestListingDraft({ title, description, imageUrls })
+    setTagSuggesting(false)
+    if (!res.ok) {
+      setError(res.message)
+      return
+    }
+    if (res.title) setTitle(res.title)
+    if (res.description) setDescription(res.description)
+    setSelectedTags((prev) => {
+      const merged = [...new Set([...prev, ...res.tags])]
+      return merged.slice(0, 5)
+    })
+    setTagHint(
+      res.source === 'gemini'
+        ? 'Applied Gemini suggestions for title, description, and/or categories — edit anything before you publish.'
+        : 'Applied keyword-based categories from your text only — configure Gemini on the server to draft from photos too.'
+    )
+  }
+
   useEffect(() => {
     fetch(`${API_BASE}/auth/me`, { credentials: 'include' })
       .then(res => { setIsLoggedIn(res.ok); setAuthChecked(true) })
@@ -125,6 +162,7 @@ export function CreateAuctionPage() {
           shipping_time_days: parseInt(shippingTime, 10),
           expedited_shipping_cost: parseFloat(expeditedCost),
           image_urls: imageUrls,
+          tags: selectedTags,
         })
       })
 
@@ -173,7 +211,10 @@ export function CreateAuctionPage() {
     <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-8">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">List an Item for Auction</h1>
-        <p className="text-gray-500 mt-2">Fill out the details below to publish your item to the public marketplace.</p>
+        <p className="text-gray-500 mt-2">
+          Fill out the form below. Use <strong>Suggest with Gemini</strong> after you add text and/or photos — it runs
+          only when you click the button, then fills title, description, and categories for you to review.
+        </p>
       </div>
 
       <Card>
@@ -274,9 +315,56 @@ export function CreateAuctionPage() {
               )}
             </div>
 
+            <div className="rounded-lg border border-stone-200 bg-stone-50/50 p-4 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <label className="text-sm font-medium text-gray-800">Categories (optional)</label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0 border-orange-200 text-orange-900 hover:bg-orange-50"
+                  disabled={tagSuggesting}
+                  onClick={() => void runSuggestFromGemini()}
+                >
+                  {tagSuggesting ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
+                  ) : (
+                    <Sparkles className="h-4 w-4 mr-1.5" />
+                  )}
+                  Suggest with Gemini
+                </Button>
+              </div>
+              <p className="text-xs text-gray-600">
+                Gemini uses your <strong>title</strong>, <strong>description</strong>, and up to <strong>four uploaded
+                photos</strong> (HTTPS URLs we fetch on the server). Nothing is sent until you click the button. Tags
+                match the category bar — pick up to five manually or merge with suggestions.
+              </p>
+              {tagHint && <p className="text-xs text-emerald-800">{tagHint}</p>}
+              <div className="flex flex-wrap gap-2">
+                {MARKETPLACE_NAV_TAGS.map((tag) => {
+                  const on = selectedTags.includes(tag)
+                  return (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => toggleTag(tag)}
+                      className={cn(
+                        'text-xs font-medium rounded-full px-3 py-1.5 border transition-colors',
+                        on
+                          ? 'border-orange-500 bg-orange-100 text-orange-950'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-orange-200 hover:bg-orange-50/50'
+                      )}
+                    >
+                      {tag}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Starting Price ($) *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Starting price (CAD) *</label>
                 <Input 
                    type="number" step="0.01" min="1"
                    placeholder="0.00"
@@ -323,7 +411,7 @@ export function CreateAuctionPage() {
                   />
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Expedited Shipping Cost ($)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Expedited shipping (CAD)</label>
                   <Input 
                      type="number" step="0.01" min="0"
                      value={expeditedCost} onChange={e => setExpeditedCost(e.target.value)}

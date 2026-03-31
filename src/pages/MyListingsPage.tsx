@@ -5,12 +5,13 @@ import { fetchMyListings, type MyListingRow } from '@/api/myListings'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { formatAppCurrency } from '@/lib/currency'
 import { parseUtcInstantMs } from '@/lib/utils'
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api'
 
 function formatMoney(n: number) {
-  return n.toLocaleString(undefined, { style: 'currency', currency: 'USD' })
+  return formatAppCurrency(n)
 }
 
 function isListingLive(item: MyListingRow): boolean {
