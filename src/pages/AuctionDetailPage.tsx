@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
-import { cn } from '@/lib/utils'
+import { cn, parseUtcInstantMs } from '@/lib/utils'
 import type { AuctionDetail } from '@/types/auction'
 
 function formatMoney(n: number) {
@@ -17,8 +17,8 @@ function formatMoney(n: number) {
 
 function timeLeft(endsAt: string | null) {
   if (!endsAt) return '—'
-  const end = new Date(endsAt).getTime()
-  if (Number.isNaN(end)) return '—'
+  const end = parseUtcInstantMs(endsAt)
+  if (!Number.isFinite(end)) return '—'
   const now = Date.now()
   const s = Math.max(0, Math.floor((end - now) / 1000))
   const h = Math.floor(s / 3600)
@@ -332,10 +332,15 @@ function ClosedAuctionSection({ auction }: { auction: AuctionDetail }) {
             flow exists.
           </div>
         )}
-        {isSold && (
+        {isSold && !auction.isPaid && (
           <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-950">
             Your item sold for <strong>{formatMoney(auction.currentBid)}</strong>. The buyer has an unpaid order until they
             complete checkout.
+          </div>
+        )}
+        {isSold && auction.isPaid && (
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-950">
+            Your item sold for <strong>{formatMoney(auction.currentBid)}</strong>. Payment has been completed.
           </div>
         )}
       </div>
@@ -351,6 +356,19 @@ function ClosedAuctionSection({ auction }: { auction: AuctionDetail }) {
   }
 
   if (isSold && auction.viewerIsWinner) {
+    if (auction.isPaid) {
+      return (
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-4 flex gap-3">
+          <CheckCircle2 className="h-8 w-8 text-emerald-600 shrink-0" />
+          <div>
+            <p className="font-semibold text-gray-900">You won — payment complete</p>
+            <p className="text-sm text-gray-600 mt-1">
+              Final price <strong>{formatMoney(auction.currentBid)}</strong>. Thank you for your purchase.
+            </p>
+          </div>
+        </div>
+      )
+    }
     return (
       <div
         className={cn(
@@ -363,8 +381,7 @@ function ClosedAuctionSection({ auction }: { auction: AuctionDetail }) {
           <div>
             <p className="font-semibold text-gray-900">You won this auction</p>
             <p className="text-sm text-gray-600 mt-1">
-              Final price <strong>{formatMoney(auction.currentBid)}</strong>. Complete payment to confirm your purchase
-              (UC4 — unpaid order).
+              Final price <strong>{formatMoney(auction.currentBid)}</strong>. Complete checkout to pay for your item.
             </p>
           </div>
         </div>

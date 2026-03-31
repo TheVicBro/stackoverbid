@@ -20,8 +20,10 @@ export interface AuctionDetail {
   unpaidOrderId?: string
   /** Mock: true when the signed-in user is the seller (UC4 seller view) */
   viewerIsSeller: boolean
-  /** Mock: true when the signed-in user won (UC4 winner → unpaid order) */
+  /** True when the signed-in user is the winning bidder (highest_bidder_id). */
   viewerIsWinner: boolean
+  /** Backend item.status === 'paid' after checkout. */
+  isPaid?: boolean
 }
 
 export type PlaceBidErrorCode = 'AUCTION_CLOSED' | 'BID_TOO_LOW'
@@ -51,4 +53,6 @@ export interface AppNotification {
   body: string
   createdAt: string
   read: boolean
+  /** When set, winner can open checkout for this item. */
+  checkoutItemId?: string
 }

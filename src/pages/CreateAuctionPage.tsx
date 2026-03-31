@@ -308,6 +308,10 @@ export function CreateAuctionPage() {
                   />
                 </div>
               </div>
+              <p className="text-xs text-gray-500 sm:col-span-2">
+                End date and time use <strong>your computer&apos;s local timezone</strong>. They are sent to the server as
+                UTC (ISO 8601), and countdowns use that same instant everywhere.
+              </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-2">

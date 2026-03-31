@@ -2,11 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { AlertCircle, CheckCircle2, CreditCard, Loader2, ShieldCheck } from 'lucide-react'
 import { getCheckoutPage, processTransaction } from '@/api/payment'
-import type { CardDetailsInput, CheckoutDTO, TransactionReceiptDTO } from '@/types/payment'
+import type { CardDetailsInput, CheckoutDTO, PaymentReceiptDTO } from '@/types/payment'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
+import { digitsOnlyMax, formatCardExpiryInput } from '@/lib/utils'
 
 function formatMoney(n: number, currency: string) {
   try {
@@ -23,7 +24,8 @@ export function CheckoutPage() {
   const [loadMessage, setLoadMessage] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [paymentError, setPaymentError] = useState<string | null>(null)
-  const [receipt, setReceipt] = useState<TransactionReceiptDTO | null>(null)
+  const [receipt, setReceipt] = useState<PaymentReceiptDTO | null>(null)
+  const [expeditedShipping, setExpeditedShipping] = useState(false)
 
   const [form, setForm] = useState<CardDetailsInput>({
     nameOnCard: '',
@@ -34,8 +36,9 @@ export function CheckoutPage() {
 
   const total = useMemo(() => {
     if (!checkout) return 0
-    return checkout.itemPrice + checkout.shippingCost
-  }, [checkout])
+    const shipping = expeditedShipping ? checkout.expeditedShippingFee : 0
+    return checkout.itemPrice + shipping
+  }, [checkout, expeditedShipping])
 
   useEffect(() => {
     if (!auctionId) return
@@ -49,12 +52,14 @@ export function CheckoutPage() {
       if (!res.ok) {
         setPhase('unavailable')
         setLoadMessage(
-          res.code === 'NOT_WINNER'
-            ? 'Only the winning bidder can open checkout for this auction.'
-            : 'Checkout is not available for this auction.'
+          res.message ??
+            (res.code === 'NOT_WINNER'
+              ? 'Only the winning bidder can open checkout for this auction.'
+              : 'Checkout is not available for this auction.')
         )
         return
       }
+      setExpeditedShipping(false)
       setCheckout(res.checkout)
       setPhase('form')
     })
@@ -70,7 +75,7 @@ export function CheckoutPage() {
     setSubmitting(true)
 
     try {
-      const result = await processTransaction(form, total, auctionId)
+      const result = await processTransaction(form, auctionId, expeditedShipping)
       if (!result.ok) {
         setPaymentError(result.message)
         return
@@ -126,7 +131,7 @@ export function CheckoutPage() {
     )
   }
 
-  if (phase === 'success' && receipt && checkout) {
+  if (phase === 'success' && receipt) {
     return (
       <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10 space-y-6">
         <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -144,31 +149,45 @@ export function CheckoutPage() {
               <div>
                 <CardTitle className="text-lg text-emerald-950">Payment successful</CardTitle>
                 <CardDescription className="text-emerald-900/80">
-                  UC5 — your bank authorized the charge; receipt below matches TransactionReceiptDTO.
+                  Receipt from your API (UC5–UC6): POST pay, then confirmed with GET receipt.
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Transaction</span>
-              <span className="font-mono text-gray-900">{receipt.transactionId}</span>
+            <div className="flex justify-between gap-2">
+              <span className="text-gray-600 shrink-0">Order</span>
+              <span className="font-mono text-gray-900 text-right">#{receipt.orderId}</span>
+            </div>
+            <div className="flex justify-between gap-2">
+              <span className="text-gray-600 shrink-0">Item</span>
+              <span className="text-gray-900 text-right max-w-[14rem]">{receipt.itemTitle}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Item</span>
-              <span className="text-gray-900 text-right max-w-[14rem]">{checkout.title}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Amount charged</span>
+              <span className="text-gray-600">Amount paid</span>
               <span className="font-semibold tabular-nums text-gray-900">
-                {formatMoney(receipt.amount, receipt.currency)}
+                {formatMoney(receipt.amountPaid, checkout?.currency ?? 'USD')}
               </span>
             </div>
+            <div className="flex justify-between gap-2 items-start">
+              <span className="text-gray-600 shrink-0">Ship to</span>
+              <span className="text-gray-900 text-right text-xs max-w-[16rem]">{receipt.shippingAddress}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Shipping</span>
+              <span className="text-gray-900">
+                {receipt.expeditedShipping ? 'Expedited' : 'Standard'} · est. {receipt.shippingTimeDays}{' '}
+                day{receipt.shippingTimeDays === 1 ? '' : 's'}
+              </span>
+            </div>
+            {receipt.message ? (
+              <p className="text-xs text-emerald-900/90 border-t border-emerald-200/60 pt-2">{receipt.message}</p>
+            ) : null}
             <p className="text-xs text-gray-500">
-              Paid {new Date(receipt.paidAt).toLocaleString()} · Status {receipt.status}
+              Paid {new Date(receipt.paidAt).toLocaleString()}
             </p>
             <Button asChild className="w-full bg-orange-500 hover:bg-orange-400 text-white font-semibold mt-2">
-              <Link to={`/auctions/${receipt.auctionId}`}>View auction</Link>
+              <Link to={`/auctions/${auctionId}`}>View auction</Link>
             </Button>
           </CardContent>
         </Card>
@@ -204,7 +223,7 @@ export function CheckoutPage() {
             <div>
               <CardTitle className="text-lg">Pay for your win</CardTitle>
               <CardDescription className="mt-1">
-                UC5 — Phase 1 loads item price + shipping; Phase 2 submits card details to your Payment Facade.
+                Mock card form — values are validated by the backend payment facade (no real charges).
               </CardDescription>
             </div>
           </div>
@@ -215,14 +234,35 @@ export function CheckoutPage() {
             <p className="text-xs text-gray-500 mt-1">Auction #{checkout.auctionId}</p>
           </div>
 
+          {checkout.expeditedShippingFee > 0 && (
+            <label className="flex items-start gap-3 rounded-lg border border-stone-200 bg-white px-3 py-2.5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={expeditedShipping}
+                onChange={(e) => setExpeditedShipping(e.target.checked)}
+                className="mt-1 rounded border-gray-300"
+              />
+              <span className="text-sm">
+                <span className="font-medium text-gray-900">Expedited shipping</span>
+                <span className="text-gray-600 block text-xs mt-0.5">
+                  Add {formatMoney(checkout.expeditedShippingFee, checkout.currency)} (matches server shipping strategy)
+                </span>
+              </span>
+            </label>
+          )}
+
           <div className="rounded-lg border border-stone-200 bg-stone-50/80 p-3 text-sm space-y-2">
             <div className="flex justify-between">
-              <span className="text-gray-600">Item price</span>
+              <span className="text-gray-600">Winning bid (item)</span>
               <span className="tabular-nums font-medium">{formatMoney(checkout.itemPrice, checkout.currency)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Shipping</span>
-              <span className="tabular-nums font-medium">{formatMoney(checkout.shippingCost, checkout.currency)}</span>
+              <span className="text-gray-600">Shipping option</span>
+              <span className="tabular-nums font-medium">
+                {expeditedShipping
+                  ? formatMoney(checkout.expeditedShippingFee, checkout.currency)
+                  : formatMoney(0, checkout.currency)}
+              </span>
             </div>
             <Separator className="bg-stone-200" />
             <div className="flex justify-between text-base">
@@ -237,8 +277,7 @@ export function CheckoutPage() {
           <div className="flex gap-2 rounded-md border border-blue-100 bg-blue-50/80 px-3 py-2 text-xs text-blue-950">
             <ShieldCheck className="h-4 w-4 shrink-0 mt-0.5" />
             <span>
-              Mock form only. In production, use your payment provider’s tokenization or hosted fields — never send raw card
-              data through your own server unless you are PCI compliant.
+              Demo only: card fields are sent to your API over HTTPS (cookie session). Use a PSP or tokens in production.
             </span>
           </div>
 
@@ -265,12 +304,15 @@ export function CheckoutPage() {
                 inputMode="numeric"
                 autoComplete="cc-number"
                 value={form.cardNumber}
-                onChange={(e) => setForm((f) => ({ ...f, cardNumber: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, cardNumber: digitsOnlyMax(e.target.value, 19) }))
+                }
                 required
-                placeholder="4242 4242 4242 4242"
+                placeholder="4242424242424242"
+                maxLength={19}
               />
               <p className="text-[11px] text-gray-500">
-                Demo: use any 12+ digit number. Ending in <strong>0000</strong> simulates a declined card.
+                Must pass server rules: 13–19 digits, valid MM/YY expiry, 3–4 digit CVC (e.g. test card 4111111111111111).
               </p>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -280,11 +322,15 @@ export function CheckoutPage() {
                 </label>
                 <Input
                   id="expiry"
+                  inputMode="numeric"
                   autoComplete="cc-exp"
                   value={form.expiry}
-                  onChange={(e) => setForm((f) => ({ ...f, expiry: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, expiry: formatCardExpiryInput(e.target.value) }))
+                  }
                   required
                   placeholder="MM/YY"
+                  maxLength={5}
                 />
               </div>
               <div className="space-y-1.5">
@@ -294,9 +340,12 @@ export function CheckoutPage() {
                 <Input
                   id="cvv"
                   type="password"
+                  inputMode="numeric"
                   autoComplete="cc-csc"
                   value={form.cvv}
-                  onChange={(e) => setForm((f) => ({ ...f, cvv: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, cvv: digitsOnlyMax(e.target.value, 4) }))
+                  }
                   required
                   placeholder="•••"
                   maxLength={4}

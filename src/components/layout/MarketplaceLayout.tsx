@@ -11,13 +11,15 @@ export function MarketplaceLayout() {
   const [showAuth, setShowAuth] = useState<false | "login" | "signup">(false)
   const [loadingAuth, setLoadingAuth] = useState(true)
   const [user, setUser] = useState<{id: number, username: string, first_name: string, last_name: string} | null>(null)
-  const [myListings, setMyListings] = useState<{id: number, title: string, current_price: number}[]>([])
+  const [myListings, setMyListings] = useState<
+    { id: number; title: string; current_price: number; status: string }[]
+  >([])
   const [profileOpen, setProfileOpen] = useState(false)
   
   const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "/api"
 
   useEffect(() => {
-    fetch(`${API_BASE}/auth/me`, { credentials: "include" })
+    fetch(`${API_BASE}/auth/me`, { credentials: "include", cache: "no-store" })
       .then(res => res.ok ? res.json() : null)
       .then(data => setUser(data))
       .catch((e) => console.error("Auth check failed:", e))
@@ -36,8 +38,26 @@ export function MarketplaceLayout() {
     setProfileOpen(true)
     if (!user) return
     try {
-      const res = await fetch(`${API_BASE}/catalogue/items?seller_id=${user.id}`, { credentials: "include" })
-      if (res.ok) setMyListings(await res.json())
+      const res = await fetch(`${API_BASE}/catalogue/items?seller_id=${user.id}`, {
+        credentials: "include",
+        cache: "no-store",
+      })
+      if (res.ok) {
+        const rows = (await res.json()) as {
+          id: number
+          title: string
+          current_price: number
+          status: string
+        }[]
+        setMyListings(
+          rows.map((r) => ({
+            id: r.id,
+            title: r.title,
+            current_price: r.current_price,
+            status: r.status,
+          }))
+        )
+      }
     } catch { /* ignore */ }
   }
 
@@ -46,7 +66,7 @@ export function MarketplaceLayout() {
       <Authentication
         initialMode={showAuth === "signup" ? "signup" : "login"}
         onAuthed={() => {
-          fetch(`${API_BASE}/auth/me`, { credentials: "include" })
+          fetch(`${API_BASE}/auth/me`, { credentials: "include", cache: "no-store" })
             .then(res => res.json())
             .then(data => {
               setUser(data)
@@ -145,7 +165,14 @@ export function MarketplaceLayout() {
                                 onClick={() => setProfileOpen(false)}
                                 className="flex items-center justify-between gap-2 rounded px-2 py-1.5 hover:bg-orange-50 transition-colors group"
                               >
-                                <span className="text-sm text-gray-700 truncate group-hover:text-orange-600">{item.title}</span>
+                                <span className="text-sm text-gray-700 truncate group-hover:text-orange-600 min-w-0">
+                                  {item.title}
+                                  {item.status !== 'active' && (
+                                    <span className="ml-1 text-[10px] uppercase text-gray-400 font-semibold">
+                                      ({item.status})
+                                    </span>
+                                  )}
+                                </span>
                                 <span className="text-xs font-semibold text-gray-500 shrink-0">${item.current_price.toFixed(2)}</span>
                               </Link>
                             </li>

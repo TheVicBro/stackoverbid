@@ -1,9 +1,4 @@
-import type {
-  AppNotification,
-  AuctionDetail,
-  PlaceBidResult,
-  UnpaidOrder,
-} from '@/types/auction'
+import type { AuctionDetail, PlaceBidResult, UnpaidOrder } from '@/types/auction'
 
 /**
  * Replace mock implementations with fetch() to your backend once the Vite proxy is set up.
@@ -198,34 +193,4 @@ export function getUnpaidOrder(orderId: string): Promise<UnpaidOrder | null> {
       })
     }, 200)
   })
-}
-
-/** Mock notifications matching UC3 / UC4 (outbid, winner, sold, auction closed) */
-export function listNotifications(): Promise<AppNotification[]> {
-  return Promise.resolve([
-    {
-      id: 'n1',
-      kind: 'OUTBID',
-      title: 'You were outbid',
-      body: 'Another bidder placed a higher bid on Vintage Camera.',
-      createdAt: new Date(Date.now() - 3600000).toISOString(),
-      read: false,
-    },
-    {
-      id: 'n2',
-      kind: 'WINNER',
-      title: 'You won',
-      body: 'You won Rare Watch. Complete payment to finalize your purchase.',
-      createdAt: new Date(Date.now() - 7200000).toISOString(),
-      read: true,
-    },
-    {
-      id: 'n3',
-      kind: 'AUCTION_CLOSED',
-      title: 'Auction closed',
-      body: 'The auction for Collectible Card has ended.',
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-      read: true,
-    },
-  ])
 }

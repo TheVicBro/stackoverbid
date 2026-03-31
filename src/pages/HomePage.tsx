@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { parseUtcInstantMs } from '@/lib/utils'
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api'
 
@@ -16,7 +17,8 @@ interface AuctionItem {
 }
 
 function timeLeft(endsAt: string) {
-  const end = new Date(endsAt).getTime()
+  const end = parseUtcInstantMs(endsAt)
+  if (!Number.isFinite(end)) return 'Ended'
   const now = Date.now()
   const s = Math.max(0, Math.floor((end - now) / 1000))
   if (s <= 0) return 'Ended'
@@ -28,7 +30,7 @@ function timeLeft(endsAt: string) {
 }
 
 function isEndingSoon(endsAt: string) {
-  return (new Date(endsAt).getTime() - Date.now()) < 3 * 60 * 60 * 1000
+  return parseUtcInstantMs(endsAt) - Date.now() < 3 * 60 * 60 * 1000
 }
 
 function AuctionCard({ item }: { item: AuctionItem }) {
@@ -97,7 +99,10 @@ export function HomePage() {
 
   useEffect(() => {
     async function fetchSection(sort: string): Promise<AuctionItem[]> {
-      const res = await fetch(`${API_BASE}/catalogue/items?sort=${sort}`, { credentials: 'include' })
+      const res = await fetch(`${API_BASE}/catalogue/items?sort=${sort}`, {
+        credentials: 'include',
+        cache: 'no-store',
+      })
       if (res.status === 401) { setUnauthenticated(true); return [] }
       if (!res.ok) return []
       return res.json()

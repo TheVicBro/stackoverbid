@@ -1,16 +1,44 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { AuctionDetail } from '@/types/auction'
+import { useCallback, useEffect, useState } from 'react'
+import type { AuctionDetail, AuctionOutcome } from '@/types/auction'
+import { parseUtcInstantMs } from '@/lib/utils'
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api'
 
 async function fetchAuction(auctionId: string): Promise<AuctionDetail> {
-  const res = await fetch(`${API_BASE}/catalogue/items/${auctionId}`, {
-    credentials: 'include',
-  })
-  if (!res.ok) throw new Error('Could not load this auction.')
-  const item = await res.json()
+  const [itemRes, meRes] = await Promise.all([
+    fetch(`${API_BASE}/catalogue/items/${auctionId}`, { credentials: 'include', cache: 'no-store' }),
+    fetch(`${API_BASE}/auth/me`, { credentials: 'include', cache: 'no-store' }),
+  ])
+
+  if (!itemRes.ok) throw new Error('Could not load this auction.')
+  const item = await itemRes.json()
+  const me = meRes.ok ? ((await meRes.json()) as { id: number }) : null
+
   const rawUrls = item.image_urls
   const imageUrls = Array.isArray(rawUrls) ? rawUrls.filter((u: unknown) => typeof u === 'string') : []
+
+  const backendStatus = item.status as string
+  const endMs = parseUtcInstantMs(item.end_time as string)
+  const endTimePassed = Number.isFinite(endMs) && endMs <= Date.now()
+
+  const isLive = backendStatus === 'active' && !endTimePassed
+
+  const highestBidderId = item.highest_bidder_id as number | null | undefined
+  const sellerId = item.seller_id as number
+
+  let outcome: AuctionOutcome | undefined
+  if (!isLive) {
+    if (backendStatus === 'paid') {
+      outcome = highestBidderId != null ? 'SOLD' : undefined
+    } else if (backendStatus === 'closed') {
+      outcome = highestBidderId != null ? 'SOLD' : 'UNSOLD'
+    } else if (backendStatus === 'active' && endTimePassed) {
+      outcome = highestBidderId != null ? 'SOLD' : 'UNSOLD'
+    }
+  }
+
+  const viewerIsSeller = me != null && me.id === sellerId
+  const viewerIsWinner = me != null && highestBidderId != null && me.id === highestBidderId
 
   return {
     id: String(item.id),
@@ -21,9 +49,11 @@ async function fetchAuction(auctionId: string): Promise<AuctionDetail> {
     minIncrement: 1,
     bidCount: 0,
     endsAt: item.end_time,
-    status: item.status === 'active' ? 'LIVE' : 'CLOSED',
-    viewerIsSeller: false,
-    viewerIsWinner: false,
+    status: isLive ? 'LIVE' : 'CLOSED',
+    outcome,
+    viewerIsSeller,
+    viewerIsWinner,
+    isPaid: backendStatus === 'paid',
   }
 }
 
@@ -41,7 +71,11 @@ export function useAuctionDetail(auctionId: string | undefined, viewerIsSeller: 
     }
     try {
       const data = await fetchAuction(auctionId)
-      setAuction(data)
+      if (viewerIsSeller) {
+        setAuction({ ...data, viewerIsSeller: true })
+      } else {
+        setAuction(data)
+      }
       setLoadError(null)
     } catch {
       setLoadError('Could not load this auction.')
@@ -56,15 +90,13 @@ export function useAuctionDetail(auctionId: string | undefined, viewerIsSeller: 
     void refresh()
   }, [refresh])
 
-  const isLive = useMemo(() => auction?.status === 'LIVE', [auction?.status])
-
   useEffect(() => {
-    if (!auctionId || !isLive) return
+    if (!auctionId) return
     const id = window.setInterval(() => {
       void refresh()
     }, 5000)
     return () => window.clearInterval(id)
-  }, [auctionId, isLive, refresh])
+  }, [auctionId, refresh])
 
   return { auction, loading, loadError, refresh }
 }

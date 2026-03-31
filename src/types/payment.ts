@@ -1,25 +1,29 @@
-/** Phase 1: returned by getCheckoutPage — item price + shipping (UC5). */
+/** Phase 1: item + shipping preview before pay (UC5). */
 export interface CheckoutDTO {
   auctionId: string
   title: string
   itemPrice: number
-  shippingCost: number
+  /** Added to total when buyer selects expedited shipping (matches backend strategy). */
+  expeditedShippingFee: number
   currency: string
-  /** Short label for where order ships (from backend / user profile). */
+  /** From profile or placeholder — backend uses profile address if pay request omits override. */
   shippingAddressSummary: string
 }
 
-/** Phase 2 success: receipt after bank authorization (UC5). */
-export interface TransactionReceiptDTO {
-  transactionId: string
-  auctionId: string
-  amount: number
-  currency: string
-  status: 'PAID'
+/** Receipt from POST /payment/items/{id}/pay or GET /payment/orders/{id}/receipt (UC5–UC6). */
+export interface PaymentReceiptDTO {
+  orderId: number
+  itemId: number
+  itemTitle: string
+  amountPaid: number
+  shippingAddress: string
+  shippingTimeDays: number
+  expeditedShipping: boolean
   paidAt: string
+  message: string
 }
 
-/** Form payload sent to processTransaction — replace with PSP token in production. */
+/** Form payload — mock only; backend validates format like a payment facade. */
 export interface CardDetailsInput {
   nameOnCard: string
   cardNumber: string
@@ -27,4 +31,4 @@ export interface CardDetailsInput {
   cvv: string
 }
 
-export type PaymentErrorCode = 'CARD_DECLINED' | 'NOT_WINNER' | 'CHECKOUT_UNAVAILABLE'
+export type PaymentErrorCode = 'CARD_DECLINED' | 'NOT_WINNER' | 'CHECKOUT_UNAVAILABLE' | 'VALIDATION'

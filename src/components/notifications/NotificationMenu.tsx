@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Bell } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { listNotifications } from '@/api/auction'
+import { fetchNotifications } from '@/api/notifications'
 import type { AppNotification } from '@/types/auction'
 import { cn } from '@/lib/utils'
 
@@ -19,7 +19,12 @@ export function NotificationMenu() {
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    void listNotifications().then(setItems)
+    if (!open) return
+    void fetchNotifications().then(setItems)
+  }, [open])
+
+  useEffect(() => {
+    void fetchNotifications().then(setItems)
   }, [])
 
   useEffect(() => {
@@ -52,11 +57,12 @@ export function NotificationMenu() {
         <div className="absolute right-0 mt-2 w-[min(100vw-2rem,22rem)] rounded-lg border border-gray-200 bg-white shadow-lg z-50">
           <div className="border-b border-gray-100 px-3 py-2">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Notifications</p>
-            <p className="text-xs text-gray-400 mt-0.5">
-              Mock data — wire to your API (winner, outbid, sold, closed).
-            </p>
+            <p className="text-xs text-gray-400 mt-0.5">Auction results and winner alerts from your account.</p>
           </div>
           <ul className="max-h-80 overflow-y-auto py-1">
+            {items.length === 0 && (
+              <li className="px-3 py-6 text-center text-sm text-gray-500">No notifications yet.</li>
+            )}
             {items.map((n) => (
               <li
                 key={n.id}
@@ -75,18 +81,18 @@ export function NotificationMenu() {
                 </span>
                 <p className="font-medium text-gray-900">{n.title}</p>
                 <p className="text-gray-600 text-xs mt-0.5 leading-snug">{n.body}</p>
+                {n.checkoutItemId && n.kind === 'WINNER' && (
+                  <Link
+                    to={`/checkout/${n.checkoutItemId}`}
+                    className="inline-block mt-2 text-xs font-semibold text-orange-600 hover:text-orange-700"
+                    onClick={() => setOpen(false)}
+                  >
+                    Pay now →
+                  </Link>
+                )}
               </li>
             ))}
           </ul>
-          <div className="border-t border-gray-100 px-3 py-2">
-            <Link
-              to="/auctions/sample-sold"
-              className="text-xs font-semibold text-orange-600 hover:text-orange-700"
-              onClick={() => setOpen(false)}
-            >
-              View related auction (demo) →
-            </Link>
-          </div>
         </div>
       )}
     </div>
