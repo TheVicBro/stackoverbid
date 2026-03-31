@@ -3,13 +3,16 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { NotificationMenu } from '@/components/notifications/NotificationMenu'
 import Authentication from '@/authentication'
 
 export function MarketplaceLayout() {
   const [showAuth, setShowAuth] = useState<false | "login" | "signup">(false)
   const [loadingAuth, setLoadingAuth] = useState(true)
-  const [user, setUser] = useState<{username: string, first_name: string} | null>(null)
+  const [user, setUser] = useState<{id: number, username: string, first_name: string, last_name: string} | null>(null)
+  const [myListings, setMyListings] = useState<{id: number, title: string, current_price: number}[]>([])
+  const [profileOpen, setProfileOpen] = useState(false)
   
   const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "/api"
 
@@ -24,15 +27,18 @@ export function MarketplaceLayout() {
   async function handleLogout() {
     await fetch(`${API_BASE}/auth/logout`, { method: "POST", credentials: "include" })
     setUser(null)
+    setMyListings([])
+    setProfileOpen(false)
     setShowAuth(false)
   }
 
-  if (loadingAuth) {
-    return (
-      <div className="min-h-screen bg-stone-100 flex items-center justify-center text-gray-500">
-        <p>Loading StackOverbid...</p>
-      </div>
-    )
+  async function openProfile() {
+    setProfileOpen(true)
+    if (!user) return
+    try {
+      const res = await fetch(`${API_BASE}/catalogue/items?seller_id=${user.id}`, { credentials: "include" })
+      if (res.ok) setMyListings(await res.json())
+    } catch { /* ignore */ }
   }
 
   if (showAuth) {
@@ -88,18 +94,79 @@ export function MarketplaceLayout() {
           </div>
 
           <div className="flex items-center gap-2 shrink-0 justify-self-end">
-            {user && <NotificationMenu />}
-            {user ? (
+            {loadingAuth ? (
+              <span className="text-sm text-gray-400 font-medium px-4 animate-pulse">Connecting...</span>
+            ) : user ? (
               <>
-                <span className="hidden sm:inline text-sm text-gray-300 font-medium mr-2">Hello, {user.first_name}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-300 hover:text-white hover:bg-gray-800 whitespace-nowrap"
-                  onClick={handleLogout}
-                >
-                  Log Out
-                </Button>
+                <NotificationMenu />
+                <Popover open={profileOpen} onOpenChange={setProfileOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      onClick={openProfile}
+                      className="flex items-center gap-2 rounded-full bg-gray-800 hover:bg-gray-700 px-3 py-1.5 transition-colors cursor-pointer"
+                    >
+                      <div className="h-6 w-6 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                        {user.first_name[0]}{user.last_name[0]}
+                      </div>
+                      <span className="hidden sm:inline text-sm text-gray-200 font-medium">{user.first_name}</span>
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-72 p-0 overflow-hidden">
+                    {/* Header */}
+                    <div className="bg-gray-900 px-4 py-4 flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                        {user.first_name[0]}{user.last_name[0]}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-white font-semibold truncate">{user.first_name} {user.last_name}</p>
+                        <p className="text-gray-400 text-xs truncate">@{user.username}</p>
+                      </div>
+                    </div>
+                    {/* Actions */}
+                    <div className="py-2 px-2 border-b border-gray-100">
+                      <Button variant="ghost" size="sm" className="w-full justify-start text-gray-700 hover:text-orange-600 hover:bg-orange-50 gap-2" asChild onClick={() => setProfileOpen(false)}>
+                        <Link to="/sell">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                          List a New Item
+                        </Link>
+                      </Button>
+                    </div>
+                    {/* My Listings */}
+                    <div className="px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">My Active Listings</p>
+                      {myListings.length === 0 ? (
+                        <p className="text-xs text-gray-400 italic">No active listings yet.</p>
+                      ) : (
+                        <ul className="space-y-1">
+                          {myListings.slice(0, 5).map(item => (
+                            <li key={item.id}>
+                              <Link
+                                to={`/auctions/${item.id}`}
+                                onClick={() => setProfileOpen(false)}
+                                className="flex items-center justify-between gap-2 rounded px-2 py-1.5 hover:bg-orange-50 transition-colors group"
+                              >
+                                <span className="text-sm text-gray-700 truncate group-hover:text-orange-600">{item.title}</span>
+                                <span className="text-xs font-semibold text-gray-500 shrink-0">${item.current_price.toFixed(2)}</span>
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                    {/* Footer */}
+                    <div className="border-t border-gray-100 px-2 py-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 gap-2"
+                        onClick={handleLogout}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        Log Out
+                      </Button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </>
             ) : (
               <>
@@ -125,8 +192,8 @@ export function MarketplaceLayout() {
       </nav>
 
       <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-1 overflow-x-auto py-2 text-sm font-medium no-scrollbar">
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
+          <div className="flex items-center gap-1 overflow-x-auto py-2 text-sm font-medium no-scrollbar mr-4">
             {['All', 'Electronics', 'Fashion', 'Collectibles', 'Home & Garden', 'Sports', 'Art', 'Vehicles', 'Jewelry'].map(
               (cat, i) => (
                 <a
@@ -143,6 +210,13 @@ export function MarketplaceLayout() {
               )
             )}
           </div>
+          <Link 
+            to="/sell"
+            className="hidden sm:flex shrink-0 items-center gap-1.5 bg-orange-500 text-white hover:bg-orange-600 font-semibold text-sm px-4 py-1.5 rounded-full transition-colors shadow-sm"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            Sell
+          </Link>
         </div>
       </div>
 
@@ -154,8 +228,8 @@ export function MarketplaceLayout() {
             <h3 className="text-lg font-bold text-white">Have something to sell?</h3>
             <p className="text-sm text-gray-400">List your item and reach thousands of bidders.</p>
           </div>
-          <Button className="bg-orange-500 text-white hover:bg-orange-400 font-semibold shrink-0">
-            Start Selling
+          <Button className="bg-orange-500 text-white hover:bg-orange-400 font-semibold shrink-0" asChild>
+            <Link to="/sell">Start Selling</Link>
           </Button>
         </div>
       </div>
@@ -187,9 +261,9 @@ export function MarketplaceLayout() {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-orange-400 transition-colors">
+                  <Link to="/sell" className="hover:text-orange-400 transition-colors">
                     Sell an Item
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>

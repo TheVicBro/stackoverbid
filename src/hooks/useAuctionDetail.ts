@@ -1,6 +1,27 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { getAuction } from '@/api/auction'
 import type { AuctionDetail } from '@/types/auction'
+
+const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api'
+
+async function fetchAuction(auctionId: string): Promise<AuctionDetail> {
+  const res = await fetch(`${API_BASE}/catalogue/items/${auctionId}`, {
+    credentials: 'include',
+  })
+  if (!res.ok) throw new Error('Could not load this auction.')
+  const item = await res.json()
+  return {
+    id: String(item.id),
+    title: item.title,
+    description: item.description,
+    currentBid: item.current_price,
+    minIncrement: 1,
+    bidCount: 0,
+    endsAt: item.end_time,
+    status: item.status === 'active' ? 'LIVE' : 'CLOSED',
+    viewerIsSeller: false,
+    viewerIsWinner: false,
+  }
+}
 
 export function useAuctionDetail(auctionId: string | undefined, viewerIsSeller: boolean) {
   const [auction, setAuction] = useState<AuctionDetail | null>(null)
@@ -15,7 +36,7 @@ export function useAuctionDetail(auctionId: string | undefined, viewerIsSeller: 
       return
     }
     try {
-      const data = await getAuction(auctionId, { viewerIsSeller })
+      const data = await fetchAuction(auctionId)
       setAuction(data)
       setLoadError(null)
     } catch {
