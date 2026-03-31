@@ -51,6 +51,7 @@ function App() {
             })
             .catch(() => setShowAuth(false))
         }}
+        onCancel={() => setShowAuth(false)}
       />
     )
   }

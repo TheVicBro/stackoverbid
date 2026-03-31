@@ -45,7 +45,7 @@ function getErrorMessage(err: unknown) {
   return "Request failed"
 }
 
-export default function Authentication(props: { onAuthed?: () => void }) {
+export default function Authentication(props: { onAuthed?: () => void, onCancel?: () => void }) {
   
   const API_BASE = useMemo(() => {
     return (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "/api"
@@ -66,7 +66,6 @@ export default function Authentication(props: { onAuthed?: () => void }) {
   // Sign up fields
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
-  const [address, setAddress] = useState("")
 
   async function apiJson<T>(path: string, init: RequestInit): Promise<T> {
     const res = await fetch(`${API_BASE}${path}`, {
@@ -113,8 +112,7 @@ export default function Authentication(props: { onAuthed?: () => void }) {
           username,
           password,
           first_name: formatName(firstName),
-          last_name: formatName(lastName),
-          address,
+          last_name: formatName(lastName)
         }),
       })
 
@@ -198,12 +196,6 @@ export default function Authentication(props: { onAuthed?: () => void }) {
                   placeholder="Last name"
                   autoComplete="family-name"
                 />
-                <Input
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Address"
-                  autoComplete="street-address"
-                />
               </>
             )}
 
@@ -215,9 +207,20 @@ export default function Authentication(props: { onAuthed?: () => void }) {
                 <div className="text-sm text-red-600 whitespace-pre-line">{error}</div>
             )}
 
-            <Button disabled={loading} type="submit" className="w-full bg-orange-500 hover:bg-orange-400">
+            <Button disabled={loading} type="submit" className="w-full bg-orange-500 hover:bg-orange-400 text-white">
               {loading ? "Working..." : mode === "login" ? "Sign In" : "Register"}
             </Button>
+
+            {props.onCancel && (
+              <Button 
+                type="button" 
+                variant="ghost" 
+                className="w-full mt-2 text-gray-500 hover:text-gray-700" 
+                onClick={props.onCancel}
+              >
+                Return to Home
+              </Button>
+            )}
           </form>
         </CardContent>
       </Card>
