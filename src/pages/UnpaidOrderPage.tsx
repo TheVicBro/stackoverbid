@@ -33,7 +33,7 @@ export function UnpaidOrderPage() {
   if (!orderId) {
     return (
       <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10 space-y-4">
-        <p className="text-gray-900 text-sm">Invalid order link.</p>
+        <p className="text-gray-900 dark:text-foreground text-sm">Invalid order link.</p>
         <Button asChild variant="outline">
           <Link to="/">Back home</Link>
         </Button>
@@ -44,7 +44,7 @@ export function UnpaidOrderPage() {
   if (order === undefined) {
     return (
       <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10">
-        <p className="text-gray-600 text-sm">Loading order…</p>
+        <p className="text-gray-600 dark:text-muted-foreground text-sm">Loading order…</p>
       </main>
     )
   }
@@ -52,7 +52,7 @@ export function UnpaidOrderPage() {
   if (order === null) {
     return (
       <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10 space-y-4">
-        <p className="text-gray-900 font-medium">Order not found.</p>
+        <p className="text-gray-900 dark:text-foreground font-medium">Order not found.</p>
         <Button asChild variant="outline">
           <Link to="/">Back home</Link>
         </Button>
@@ -63,18 +63,18 @@ export function UnpaidOrderPage() {
   return (
     <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10 space-y-6">
       <div className="flex flex-wrap items-center gap-2 text-sm">
-        <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium">
+        <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium dark:text-orange-400 dark:hover:text-orange-300">
           ← Home
         </Link>
-        <span className="text-gray-300">/</span>
-        <span className="text-gray-600">Unpaid order</span>
+        <span className="text-gray-300 dark:text-muted-foreground">/</span>
+        <span className="text-gray-600 dark:text-muted-foreground">Unpaid order</span>
       </div>
 
       <Card>
         <CardHeader>
           <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-orange-100 p-2">
-              <Package className="h-6 w-6 text-orange-700" />
+            <div className="rounded-lg bg-orange-100 p-2 dark:bg-orange-950/50">
+              <Package className="h-6 w-6 text-orange-700 dark:text-orange-400" />
             </div>
             <div>
               <CardTitle className="text-lg">Complete your purchase</CardTitle>
@@ -86,19 +86,19 @@ export function UnpaidOrderPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <p className="text-sm font-medium text-gray-900">{order.title}</p>
-            <p className="text-xs text-gray-500 mt-1">Order #{order.id}</p>
+            <p className="text-sm font-medium text-gray-900 dark:text-foreground">{order.title}</p>
+            <p className="text-xs text-gray-500 dark:text-muted-foreground mt-1">Order #{order.id}</p>
           </div>
           <Separator />
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Amount due</span>
-            <span className="text-lg font-bold text-gray-900 tabular-nums">
+            <span className="text-gray-600 dark:text-muted-foreground">Amount due</span>
+            <span className="text-lg font-bold text-gray-900 dark:text-foreground tabular-nums">
               {formatMoney(order.amountDue, order.currency)}
             </span>
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-muted-foreground">
             Placed {new Date(order.createdAt).toLocaleString()} · Status:{' '}
-            <strong className="text-amber-800">{order.status}</strong>
+            <strong className="text-amber-800 dark:text-amber-300">{order.status}</strong>
           </p>
           <Button asChild className="w-full bg-orange-500 hover:bg-orange-400 text-white font-semibold gap-2">
             <Link to={`/checkout/${order.auctionId}`}>
@@ -106,7 +106,7 @@ export function UnpaidOrderPage() {
               Pay now
             </Link>
           </Button>
-          <Button asChild variant="ghost" className="w-full text-gray-600">
+          <Button asChild variant="ghost" className="w-full text-gray-600 dark:text-muted-foreground">
             <Link to={`/auctions/${order.auctionId}`}>View auction</Link>
           </Button>
         </CardContent>

@@ -208,7 +208,7 @@ export function CreateAuctionPage() {
     return (
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-8">
         <div className="flex items-center justify-center py-24">
-          <p className="text-gray-400 animate-pulse">Checking authentication...</p>
+          <p className="text-gray-400 dark:text-muted-foreground animate-pulse">Checking authentication...</p>
         </div>
       </main>
     )
@@ -217,9 +217,9 @@ export function CreateAuctionPage() {
   if (!isLoggedIn) {
     return (
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-8">
-        <div className="rounded-xl border border-orange-200 bg-orange-50 p-10 text-center">
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Sign in to sell an item</h2>
-          <p className="text-gray-500 text-sm mb-6">You need a StackOverbid account to list items for auction.</p>
+        <div className="rounded-xl border border-orange-200 bg-orange-50 p-10 text-center dark:border-orange-900/50 dark:bg-orange-950/40">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-foreground mb-2">Sign in to sell an item</h2>
+          <p className="text-gray-500 dark:text-muted-foreground text-sm mb-6">You need a StackOverbid account to list items for auction.</p>
           <Link to="/" className="inline-block bg-orange-500 hover:bg-orange-400 text-white font-semibold px-6 py-2 rounded-lg transition-colors">
             Go Home & Sign In
           </Link>
@@ -231,8 +231,8 @@ export function CreateAuctionPage() {
   return (
     <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">List an Item for Auction</h1>
-        <p className="text-gray-500 mt-2">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-foreground">List an Item for Auction</h1>
+        <p className="text-gray-500 dark:text-muted-foreground mt-2">
           Fill out the form below. Use <strong>Suggest with Gemini</strong> after you add text and/or photos — it runs
           only when you click the button, then fills title, description, and categories for you to review.
         </p>
@@ -242,7 +242,7 @@ export function CreateAuctionPage() {
         <CardContent className="py-6">
           <form onSubmit={onSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title *</label>
               <Input 
                  placeholder="e.g. Vintage 1970s Rolex Submariner" 
                  value={title} onChange={e => setTitle(e.target.value)}
@@ -251,9 +251,9 @@ export function CreateAuctionPage() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description *</label>
               <textarea 
-                 className="flex w-full rounded-md border border-gray-200 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none border-transparent min-h-[120px]"
+                 className="flex w-full rounded-md border border-gray-200 dark:border-border bg-transparent dark:bg-background px-3 py-2 text-sm text-foreground placeholder:text-gray-400 dark:placeholder:text-muted-foreground focus:outline-none border-transparent min-h-[120px]"
                  style={{ border: "1px solid #e5e7eb" }}
                  placeholder="Describe the condition, history, and authenticating details of your item..."
                  value={description} onChange={e => setDescription(e.target.value)}
@@ -262,8 +262,8 @@ export function CreateAuctionPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Photos (optional)</label>
-              <p className="text-xs text-gray-500 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Photos (optional)</label>
+              <p className="text-xs text-gray-500 dark:text-muted-foreground mb-2">
                 Drag files here or click to upload. The <strong>first</strong> image is the cover on listings — drag
                 thumbnails to reorder, or use the arrows on each photo.
               </p>
@@ -295,18 +295,20 @@ export function CreateAuctionPage() {
                 className={cn(
                   'rounded-lg border-2 border-dashed px-4 py-8 text-center transition-colors cursor-pointer',
                   uploadingImages && 'pointer-events-none opacity-70',
-                  isDragOver ? 'border-orange-400 bg-orange-50/60' : 'border-gray-200 bg-stone-50/50 hover:border-orange-200 hover:bg-orange-50/30'
+                  isDragOver
+                    ? 'border-orange-400 bg-orange-50/60 dark:border-orange-500 dark:bg-orange-950/40'
+                    : 'border-gray-200 bg-stone-50/50 hover:border-orange-200 hover:bg-orange-50/30 dark:border-border dark:bg-muted/30 dark:hover:border-orange-700/50 dark:hover:bg-orange-950/20'
                 )}
               >
                 {uploadingImages ? (
-                  <div className="flex flex-col items-center gap-2 text-gray-600">
+                  <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-muted-foreground">
                     <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
                     <span className="text-sm">Uploading…</span>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center gap-2 text-gray-600">
+                  <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-muted-foreground">
                     <ImagePlus className="h-8 w-8 text-orange-500" />
-                    <span className="text-sm font-medium text-gray-800">Drop images here or click to upload</span>
+                    <span className="text-sm font-medium text-gray-800 dark:text-foreground">Drop images here or click to upload</span>
                     {!cloudinaryReady && (
                       <span className="text-xs text-amber-700 max-w-sm">
                         Cloudinary is not configured — listings can still be published without photos.
@@ -340,7 +342,7 @@ export function CreateAuctionPage() {
                         if (from === null || from === i) return
                         movePhoto(from, i)
                       }}
-                      className="relative group flex flex-col rounded-md overflow-hidden border border-gray-200 bg-stone-100 shadow-sm"
+                      className="relative group flex flex-col rounded-md overflow-hidden border border-gray-200 bg-stone-100 shadow-sm dark:border-border dark:bg-muted/40"
                     >
                       <div className="relative aspect-square w-full shrink-0">
                         <img src={url} alt="" className="h-full w-full object-cover pointer-events-none" />
@@ -368,12 +370,12 @@ export function CreateAuctionPage() {
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center justify-center gap-1 border-t border-stone-200 bg-white py-1">
+                      <div className="flex items-center justify-center gap-1 border-t border-stone-200 bg-white py-1 dark:border-border dark:bg-card">
                         <button
                           type="button"
                           disabled={i === 0}
                           onClick={() => movePhoto(i, i - 1)}
-                          className="rounded p-1 text-gray-600 hover:bg-stone-100 disabled:opacity-30 disabled:pointer-events-none"
+                          className="rounded p-1 text-gray-600 hover:bg-stone-100 disabled:opacity-30 disabled:pointer-events-none dark:text-muted-foreground dark:hover:bg-muted"
                           aria-label="Move photo earlier"
                         >
                           <ChevronLeft className="h-4 w-4" />
@@ -382,7 +384,7 @@ export function CreateAuctionPage() {
                           type="button"
                           disabled={i === imageUrls.length - 1}
                           onClick={() => movePhoto(i, i + 1)}
-                          className="rounded p-1 text-gray-600 hover:bg-stone-100 disabled:opacity-30 disabled:pointer-events-none"
+                          className="rounded p-1 text-gray-600 hover:bg-stone-100 disabled:opacity-30 disabled:pointer-events-none dark:text-muted-foreground dark:hover:bg-muted"
                           aria-label="Move photo later"
                         >
                           <ChevronRight className="h-4 w-4" />
@@ -394,11 +396,11 @@ export function CreateAuctionPage() {
               )}
             </div>
 
-            <div className="rounded-lg border border-orange-200/90 bg-gradient-to-br from-orange-50/90 to-stone-50/80 p-4 space-y-3">
+            <div className="rounded-lg border border-orange-200/90 bg-gradient-to-br from-orange-50/90 to-stone-50/80 p-4 space-y-3 dark:border-orange-900/50 dark:from-orange-950/40 dark:to-muted/50">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 space-y-1">
-                  <h2 className="text-sm font-semibold text-gray-900">Gemini listing assistant</h2>
-                  <p className="text-xs text-gray-600 max-w-xl leading-relaxed">
+                  <h2 className="text-sm font-semibold text-gray-900 dark:text-foreground">Gemini listing assistant</h2>
+                  <p className="text-xs text-gray-600 dark:text-muted-foreground max-w-xl leading-relaxed">
                     Suggests <strong>title</strong>, <strong>description</strong>, and <strong>categories</strong> from
                     your draft and up to four photos (in the order shown above). Nothing is sent until you click — then
                     review and edit before publishing.
@@ -408,7 +410,7 @@ export function CreateAuctionPage() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="shrink-0 border-orange-300 bg-white text-orange-950 hover:bg-orange-50"
+                  className="shrink-0 border-orange-300 bg-white text-orange-950 hover:bg-orange-50 dark:border-orange-700 dark:bg-card dark:text-orange-100 dark:hover:bg-muted"
                   disabled={tagSuggesting}
                   onClick={() => void runSuggestFromGemini()}
                 >
@@ -420,12 +422,16 @@ export function CreateAuctionPage() {
                   Suggest with Gemini
                 </Button>
               </div>
-              {tagHint && <p className="text-xs text-emerald-900 bg-emerald-50/80 border border-emerald-200/60 rounded-md px-2.5 py-2">{tagHint}</p>}
+              {tagHint && (
+                <p className="text-xs text-emerald-900 bg-emerald-50/80 border border-emerald-200/60 rounded-md px-2.5 py-2 dark:text-emerald-200 dark:bg-emerald-950/40 dark:border-emerald-800/60">
+                  {tagHint}
+                </p>
+              )}
             </div>
 
-            <div className="rounded-lg border border-stone-200 bg-stone-50/50 p-4 space-y-3">
-              <label className="text-sm font-medium text-gray-800">Categories (optional)</label>
-              <p className="text-xs text-gray-600">
+            <div className="rounded-lg border border-stone-200 bg-stone-50/50 p-4 space-y-3 dark:border-border dark:bg-muted/30">
+              <label className="text-sm font-medium text-gray-800 dark:text-foreground">Categories (optional)</label>
+              <p className="text-xs text-gray-600 dark:text-muted-foreground">
                 Same labels as the category bar under the header. Pick up to five, or merge with Gemini suggestions from
                 the assistant above.
               </p>
@@ -440,8 +446,8 @@ export function CreateAuctionPage() {
                       className={cn(
                         'text-xs font-medium rounded-full px-3 py-1.5 border transition-colors',
                         on
-                          ? 'border-orange-500 bg-orange-100 text-orange-950'
-                          : 'border-gray-200 bg-white text-gray-700 hover:border-orange-200 hover:bg-orange-50/50'
+                          ? 'border-orange-500 bg-orange-100 text-orange-950 dark:bg-orange-950/50 dark:text-orange-100 dark:border-orange-600'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-orange-200 hover:bg-orange-50/50 dark:border-border dark:bg-card dark:text-foreground dark:hover:bg-muted dark:hover:border-orange-700/50'
                       )}
                     >
                       {tag}
@@ -453,7 +459,7 @@ export function CreateAuctionPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Starting price (CAD) *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Starting price (CAD) *</label>
                 <Input 
                    type="number" step="0.01" min="1"
                    placeholder="0.00"
@@ -463,10 +469,10 @@ export function CreateAuctionPage() {
               </div>
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">End Date *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date *</label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className={`w-full justify-start text-left font-normal ${!endDate ? "text-gray-400" : "text-gray-900"}`}>
+                      <Button variant="outline" className={`w-full justify-start text-left font-normal ${!endDate ? 'text-gray-400 dark:text-muted-foreground' : 'text-gray-900 dark:text-foreground'}`}>
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {endDate ? format(endDate, "PPP") : "Select date..."}
                       </Button>
@@ -477,7 +483,7 @@ export function CreateAuctionPage() {
                   </Popover>
                 </div>
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">End Time *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Time *</label>
                   <Input 
                      type="time" 
                      value={endTime} onChange={e => setEndTime(e.target.value)}
@@ -485,7 +491,7 @@ export function CreateAuctionPage() {
                   />
                 </div>
               </div>
-              <p className="text-xs text-gray-500 sm:col-span-2">
+              <p className="text-xs text-gray-500 dark:text-muted-foreground sm:col-span-2">
                 End date and time use <strong>your computer&apos;s local timezone</strong>. They are sent to the server as
                 UTC (ISO 8601), and countdowns use that same instant everywhere.
               </p>
@@ -493,14 +499,14 @@ export function CreateAuctionPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-2">
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Standard Shipping (Days)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Standard Shipping (Days)</label>
                   <Input 
                      type="number" min="1" max="30"
                      value={shippingTime} onChange={e => setShippingTime(e.target.value)}
                   />
                </div>
                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Expedited shipping (CAD)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Expedited shipping (CAD)</label>
                   <Input 
                      type="number" step="0.01" min="0"
                      value={expeditedCost} onChange={e => setExpeditedCost(e.target.value)}
@@ -509,7 +515,7 @@ export function CreateAuctionPage() {
             </div>
 
             {error && (
-               <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm border border-red-200">
+               <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm border border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-900/60">
                   <strong>Error: </strong> {error}
                </div>
             )}

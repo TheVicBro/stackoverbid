@@ -73,7 +73,7 @@ export function ProfilePage() {
 
   if (phase === 'loading') {
     return (
-      <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10 flex items-center gap-2 text-gray-600 text-sm">
+      <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10 flex items-center gap-2 text-gray-600 dark:text-muted-foreground text-sm">
         <Loader2 className="h-4 w-4 animate-spin" />
         Loading profile…
       </main>
@@ -83,7 +83,7 @@ export function ProfilePage() {
   if (phase === 'unauth') {
     return (
       <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10 space-y-4">
-        <p className="text-gray-900 text-sm">Sign in to edit your profile and shipping address.</p>
+        <p className="text-gray-900 dark:text-foreground text-sm">Sign in to edit your profile and shipping address.</p>
         <Button asChild className="bg-orange-500 hover:bg-orange-400 text-white">
           <Link to="/">Back to home</Link>
         </Button>
@@ -94,7 +94,7 @@ export function ProfilePage() {
   if (phase === 'error') {
     return (
       <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10 space-y-4">
-        <p className="text-gray-900 text-sm">{loadMessage ?? 'Could not load profile.'}</p>
+        <p className="text-gray-900 dark:text-foreground text-sm">{loadMessage ?? 'Could not load profile.'}</p>
         <Button asChild variant="outline">
           <Link to="/">Back home</Link>
         </Button>
@@ -105,18 +105,18 @@ export function ProfilePage() {
   return (
     <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10 space-y-6">
       <div className="flex flex-wrap items-center gap-2 text-sm">
-        <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium">
+        <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium dark:text-orange-400 dark:hover:text-orange-300">
           ← Home
         </Link>
-        <span className="text-gray-300">/</span>
-        <span className="text-gray-600">Profile</span>
+        <span className="text-gray-300 dark:text-muted-foreground">/</span>
+        <span className="text-gray-600 dark:text-muted-foreground">Profile</span>
       </div>
 
       <Card>
         <CardHeader>
           <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-orange-100 p-2">
-              <User className="h-6 w-6 text-orange-700" />
+            <div className="rounded-lg bg-orange-100 p-2 dark:bg-orange-950/50">
+              <User className="h-6 w-6 text-orange-700 dark:text-orange-400" />
             </div>
             <div>
               <CardTitle className="text-lg">Your profile</CardTitle>
@@ -129,12 +129,12 @@ export function ProfilePage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <p className="text-xs text-gray-500">
-              Username <span className="font-medium text-gray-700">@{username}</span> cannot be changed here.
+            <p className="text-xs text-gray-500 dark:text-muted-foreground">
+              Username <span className="font-medium text-gray-700 dark:text-gray-300">@{username}</span> cannot be changed here.
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label htmlFor="firstName" className="text-xs font-medium text-gray-700">
+                <label htmlFor="firstName" className="text-xs font-medium text-gray-700 dark:text-gray-300">
                   First name
                 </label>
                 <Input
@@ -146,7 +146,7 @@ export function ProfilePage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label htmlFor="lastName" className="text-xs font-medium text-gray-700">
+                <label htmlFor="lastName" className="text-xs font-medium text-gray-700 dark:text-gray-300">
                   Last name
                 </label>
                 <Input
@@ -159,10 +159,10 @@ export function ProfilePage() {
               </div>
             </div>
             <div className="space-y-1.5">
-              <label htmlFor="address" className="text-xs font-medium text-gray-700">
-                Shipping address <span className="font-normal text-gray-500">(optional)</span>
+              <label htmlFor="address" className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                Shipping address <span className="font-normal text-gray-500 dark:text-muted-foreground">(optional)</span>
               </label>
-              <p className="text-[11px] text-gray-500">
+              <p className="text-[11px] text-gray-500 dark:text-muted-foreground">
                 Leave this empty when saving to keep your current saved address unchanged. Fill it when you want to add
                 or replace it.
               </p>
@@ -177,7 +177,7 @@ export function ProfilePage() {
               />
             </div>
             {saveError && (
-              <p className="text-sm text-red-600" role="alert">
+              <p className="text-sm text-red-600 dark:text-red-400" role="alert">
                 {saveError}
               </p>
             )}

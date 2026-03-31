@@ -30,23 +30,23 @@ function statusLabel(item: MyListingRow): string {
 
 function ListingRows({ items, empty }: { items: MyListingRow[]; empty: string }) {
   if (items.length === 0) {
-    return <p className="text-sm text-gray-500">{empty}</p>
+    return <p className="text-sm text-gray-500 dark:text-muted-foreground">{empty}</p>
   }
   return (
-    <ul className="divide-y divide-stone-100 border border-stone-200 rounded-lg overflow-hidden bg-white">
+    <ul className="divide-y divide-stone-100 border border-stone-200 rounded-lg overflow-hidden bg-white dark:divide-border dark:border-border dark:bg-card">
       {items.map((item) => {
         const live = isListingLive(item)
         const canEdit = live && item.highest_bidder_id == null
         return (
           <li
             key={item.id}
-            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-3 py-3 hover:bg-stone-50/80"
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-3 py-3 hover:bg-stone-50/80 dark:hover:bg-muted/50"
           >
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <Link
                   to={`/auctions/${item.id}?as=seller`}
-                  className="font-medium text-gray-900 hover:text-orange-600 truncate"
+                  className="font-medium text-gray-900 dark:text-foreground hover:text-orange-600 dark:hover:text-orange-400 truncate"
                 >
                   {item.title}
                 </Link>
@@ -61,20 +61,20 @@ function ListingRows({ items, empty }: { items: MyListingRow[]; empty: string })
                   {statusLabel(item)}
                 </Badge>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 dark:text-muted-foreground mt-1">
                 Current {formatMoney(item.current_price)}
                 {item.starting_price !== item.current_price ? (
-                  <span className="text-gray-400"> · started {formatMoney(item.starting_price)}</span>
+                  <span className="text-gray-400 dark:text-gray-500"> · started {formatMoney(item.starting_price)}</span>
                 ) : null}
                 {live && item.end_time ? (
-                  <span className="text-gray-400"> · ends {new Date(parseUtcInstantMs(item.end_time)).toLocaleString()}</span>
+                  <span className="text-gray-400 dark:text-gray-500"> · ends {new Date(parseUtcInstantMs(item.end_time)).toLocaleString()}</span>
                 ) : item.end_time ? (
-                  <span className="text-gray-400"> · ended {new Date(parseUtcInstantMs(item.end_time)).toLocaleString()}</span>
+                  <span className="text-gray-400 dark:text-gray-500"> · ended {new Date(parseUtcInstantMs(item.end_time)).toLocaleString()}</span>
                 ) : null}
               </p>
             </div>
             <div className="flex flex-wrap gap-2 shrink-0">
-              <Button asChild variant="outline" size="sm" className="border-orange-200 text-orange-800 hover:bg-orange-50">
+              <Button asChild variant="outline" size="sm" className="border-orange-200 text-orange-800 hover:bg-orange-50 dark:border-orange-800 dark:text-orange-200 dark:hover:bg-orange-950/50">
                 <Link to={`/auctions/${item.id}?as=seller`}>View</Link>
               </Button>
               {canEdit ? (
@@ -142,7 +142,7 @@ export function MyListingsPage() {
 
   if (phase === 'loading') {
     return (
-      <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-10 flex items-center gap-2 text-gray-600 text-sm">
+      <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-10 flex items-center gap-2 text-gray-600 dark:text-muted-foreground text-sm">
         <Loader2 className="h-4 w-4 animate-spin text-orange-500" />
         Loading your listings…
       </main>
@@ -152,7 +152,7 @@ export function MyListingsPage() {
   if (phase === 'unauth') {
     return (
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-10 space-y-4">
-        <p className="text-gray-900 text-sm">Sign in to see every auction you have listed.</p>
+        <p className="text-gray-900 dark:text-foreground text-sm">Sign in to see every auction you have listed.</p>
         <Button asChild className="bg-orange-500 hover:bg-orange-400 text-white">
           <Link to="/">Back to home</Link>
         </Button>
@@ -163,7 +163,7 @@ export function MyListingsPage() {
   if (phase === 'error') {
     return (
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-10 space-y-4">
-        <p className="text-gray-900 text-sm">{message ?? 'Something went wrong.'}</p>
+        <p className="text-gray-900 dark:text-foreground text-sm">{message ?? 'Something went wrong.'}</p>
         <Button asChild variant="outline">
           <Link to="/">Back home</Link>
         </Button>
@@ -174,21 +174,21 @@ export function MyListingsPage() {
   return (
     <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-10 space-y-8">
       <div className="flex flex-wrap items-center gap-2 text-sm">
-        <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium">
+        <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium dark:text-orange-400 dark:hover:text-orange-300">
           ← Home
         </Link>
-        <span className="text-gray-300">/</span>
-        <span className="text-gray-600">My listings</span>
+        <span className="text-gray-300 dark:text-muted-foreground">/</span>
+        <span className="text-gray-600 dark:text-muted-foreground">My listings</span>
       </div>
 
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">My listings</h1>
-        <p className="text-sm text-gray-600 mt-1">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-foreground">My listings</h1>
+        <p className="text-sm text-gray-600 dark:text-muted-foreground mt-1">
           Every item you have put up for auction — live now and closed. Open a listing as seller to manage it; edit title
           and description only while the auction is live and has no bids yet.
         </p>
         {items.length >= 50 ? (
-          <p className="text-xs text-amber-800 mt-2 rounded-md border border-amber-200 bg-amber-50 px-2 py-1.5 inline-block">
+          <p className="text-xs text-amber-800 mt-2 rounded-md border border-amber-200 bg-amber-50 px-2 py-1.5 inline-block dark:text-amber-200 dark:border-amber-900/50 dark:bg-amber-950/40">
             Showing the 50 most recent listings from the server. Contact support if you need older history.
           </p>
         ) : null}
@@ -197,8 +197,8 @@ export function MyListingsPage() {
       <Card>
         <CardHeader className="pb-2">
           <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-emerald-100 p-2">
-              <Store className="h-5 w-5 text-emerald-700" />
+            <div className="rounded-lg bg-emerald-100 p-2 dark:bg-emerald-950/50">
+              <Store className="h-5 w-5 text-emerald-700 dark:text-emerald-400" />
             </div>
             <div>
               <CardTitle className="text-base">Live now</CardTitle>
@@ -214,8 +214,8 @@ export function MyListingsPage() {
       <Card>
         <CardHeader className="pb-2">
           <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-stone-100 p-2">
-              <Store className="h-5 w-5 text-stone-600" />
+            <div className="rounded-lg bg-stone-100 p-2 dark:bg-muted/50">
+              <Store className="h-5 w-5 text-stone-600 dark:text-muted-foreground" />
             </div>
             <div>
               <CardTitle className="text-base">Past listings</CardTitle>

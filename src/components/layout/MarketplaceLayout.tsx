@@ -8,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { NotificationMenu } from '@/components/notifications/NotificationMenu'
 import Authentication from '@/authentication'
 import { MARKETPLACE_NAV_TAGS } from '@/constants/marketplaceCategories'
+import { ThemeToggle } from '@/theme/ThemeProvider'
 
 const NAV_CATEGORIES = ['All', ...MARKETPLACE_NAV_TAGS] as const
 
@@ -76,7 +77,7 @@ export function MarketplaceLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-100 text-gray-900 flex flex-col">
+    <div className="min-h-screen bg-stone-100 text-gray-900 flex flex-col dark:bg-background dark:text-foreground">
       <nav className="sticky top-0 z-50 bg-gray-900 border-b-[3px] border-orange-500">
         <div className="max-w-7xl mx-auto px-4 h-14 grid grid-cols-[auto_1fr_auto] items-center gap-4 md:gap-6">
           <Link to="/" className="flex items-center gap-2 shrink-0">
@@ -95,7 +96,7 @@ export function MarketplaceLayout() {
                 placeholder="Search listings by title or description..."
                 value={searchDraft}
                 onChange={(e) => setSearchDraft(e.target.value)}
-                className="h-9 rounded-r-none border-none bg-white placeholder:text-gray-400 text-gray-900 shadow-none focus-visible:ring-0"
+                className="h-9 rounded-r-none border-none bg-white placeholder:text-gray-400 text-gray-900 shadow-none focus-visible:ring-0 dark:bg-muted dark:placeholder:text-muted-foreground dark:text-foreground"
               />
               <Button
                 type="submit"
@@ -115,7 +116,8 @@ export function MarketplaceLayout() {
             </form>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0 justify-self-end">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0 justify-self-end">
+            <ThemeToggle />
             {loadingAuth ? (
               <span className="text-sm text-gray-400 font-medium px-4 animate-pulse">Connecting...</span>
             ) : user ? (
@@ -133,7 +135,7 @@ export function MarketplaceLayout() {
                       <span className="hidden sm:inline text-sm text-gray-200 font-medium">{user.first_name}</span>
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent align="end" className="w-72 p-0 overflow-hidden">
+                  <PopoverContent align="end" className="w-72 p-0 overflow-hidden dark:border-border">
                     {/* Header */}
                     <div className="bg-gray-900 px-4 py-4 flex items-center gap-3">
                       <div className="h-10 w-10 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
@@ -145,11 +147,11 @@ export function MarketplaceLayout() {
                       </div>
                     </div>
                     {/* Actions */}
-                    <div className="py-2 px-2 border-b border-gray-100 space-y-0.5">
+                    <div className="py-2 px-2 border-b border-gray-100 space-y-0.5 dark:border-border dark:bg-popover">
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="w-full justify-start text-gray-700 hover:text-orange-600 hover:bg-orange-50 gap-2"
+                        className="w-full justify-start text-gray-700 hover:text-orange-600 hover:bg-orange-50 gap-2 dark:text-foreground dark:hover:bg-muted dark:hover:text-orange-400"
                         onClick={() => {
                           setProfileOpen(false)
                           navigate('/profile')
@@ -164,7 +166,7 @@ export function MarketplaceLayout() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="w-full justify-start text-gray-700 hover:text-orange-600 hover:bg-orange-50 gap-2"
+                        className="w-full justify-start text-gray-700 hover:text-orange-600 hover:bg-orange-50 gap-2 dark:text-foreground dark:hover:bg-muted dark:hover:text-orange-400"
                         onClick={() => {
                           setProfileOpen(false)
                           navigate('/my/auctions')
@@ -176,7 +178,7 @@ export function MarketplaceLayout() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="w-full justify-start text-gray-700 hover:text-orange-600 hover:bg-orange-50 gap-2"
+                        className="w-full justify-start text-gray-700 hover:text-orange-600 hover:bg-orange-50 gap-2 dark:text-foreground dark:hover:bg-muted dark:hover:text-orange-400"
                         onClick={() => {
                           setProfileOpen(false)
                           navigate('/my/listings')
@@ -185,7 +187,7 @@ export function MarketplaceLayout() {
                         <Store className="h-3.5 w-3.5" />
                         My listings
                       </Button>
-                      <Button variant="ghost" size="sm" className="w-full justify-start text-gray-700 hover:text-orange-600 hover:bg-orange-50 gap-2" asChild onClick={() => setProfileOpen(false)}>
+                      <Button variant="ghost" size="sm" className="w-full justify-start text-gray-700 hover:text-orange-600 hover:bg-orange-50 gap-2 dark:text-foreground dark:hover:bg-muted dark:hover:text-orange-400" asChild onClick={() => setProfileOpen(false)}>
                         <Link to="/sell">
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
                           List a New Item
@@ -193,11 +195,11 @@ export function MarketplaceLayout() {
                       </Button>
                     </div>
                     {/* Footer */}
-                    <div className="border-t border-gray-100 px-2 py-2">
+                    <div className="border-t border-gray-100 px-2 py-2 dark:border-border dark:bg-popover">
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 gap-2"
+                        className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 gap-2 dark:hover:bg-red-950/50 dark:hover:text-red-400"
                         onClick={handleLogout}
                       >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -230,7 +232,7 @@ export function MarketplaceLayout() {
         </div>
       </nav>
 
-      <div className="bg-white border-b border-gray-200 shadow-sm">
+      <div className="bg-white border-b border-gray-200 shadow-sm dark:bg-card dark:border-border">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center gap-1 overflow-x-auto py-2 text-sm font-medium no-scrollbar mr-4">
             {NAV_CATEGORIES.map((cat) => {
@@ -244,7 +246,9 @@ export function MarketplaceLayout() {
                   key={cat}
                   to={to}
                   className={`shrink-0 px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
-                    active ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                    active
+                      ? 'bg-gray-900 text-white dark:bg-primary dark:text-primary-foreground'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-foreground'
                   }`}
                 >
                   {cat}

@@ -26,12 +26,12 @@ function AuctionCard({ item }: { item: CatalogueListItem }) {
   const thumb = item.image_urls?.find((u) => typeof u === 'string' && u.length > 0)
   return (
     <Link to={`/auctions/${item.id}`} className="group">
-      <Card className="overflow-hidden p-0 gap-0 hover:shadow-md hover:border-orange-200 transition-all duration-200 h-full">
-        <div className="aspect-square bg-gradient-to-br from-stone-100 to-stone-200 flex items-center justify-center overflow-hidden">
+      <Card className="overflow-hidden p-0 gap-0 hover:shadow-md hover:border-orange-200 transition-all duration-200 h-full dark:hover:border-orange-700/50">
+        <div className="aspect-square bg-gradient-to-br from-stone-100 to-stone-200 dark:from-muted/40 dark:to-muted/60 flex items-center justify-center overflow-hidden">
           {thumb ? (
             <img src={thumb} alt="" className="h-full w-full object-cover" />
           ) : (
-            <svg className="w-10 h-10 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-10 h-10 text-stone-300 dark:text-muted-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -42,10 +42,10 @@ function AuctionCard({ item }: { item: CatalogueListItem }) {
           )}
         </div>
         <CardContent className="p-3">
-          <h3 className="text-sm font-medium text-gray-900 truncate group-hover:text-orange-600 transition-colors">
+          <h3 className="text-sm font-medium text-gray-900 dark:text-foreground truncate group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
             {item.title}
           </h3>
-          <p className="mt-1 text-base font-bold text-gray-900">{formatAppCurrency(item.current_price)}</p>
+          <p className="mt-1 text-base font-bold text-gray-900 dark:text-foreground">{formatAppCurrency(item.current_price)}</p>
           <div className="mt-1.5">
             <Badge variant={isEndingSoon(item.end_time) ? 'destructive' : 'secondary'} className="text-xs">
               {timeLeft(item.end_time)}
@@ -70,15 +70,15 @@ export function AuctionBrowseGrid({
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="rounded-lg bg-stone-100 animate-pulse aspect-[3/4]" />
+          <div key={i} className="rounded-lg bg-stone-100 dark:bg-muted animate-pulse aspect-[3/4]" />
         ))}
       </div>
     )
   }
   if (items.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-gray-200 bg-white py-10 text-center">
-        <p className="text-sm text-gray-400">{emptyMsg}</p>
+      <div className="rounded-xl border border-dashed border-gray-200 bg-white dark:border-border dark:bg-card py-10 text-center">
+        <p className="text-sm text-gray-400 dark:text-muted-foreground">{emptyMsg}</p>
       </div>
     )
   }

@@ -17,27 +17,27 @@ function formatMoney(n: number) {
 
 function BidRowList({ rows, empty }: { rows: MyBidRow[]; empty: string }) {
   if (rows.length === 0) {
-    return <p className="text-sm text-gray-500">{empty}</p>
+    return <p className="text-sm text-gray-500 dark:text-muted-foreground">{empty}</p>
   }
   return (
-    <ul className="divide-y divide-stone-100 border border-stone-200 rounded-lg overflow-hidden bg-white">
+    <ul className="divide-y divide-stone-100 border border-stone-200 rounded-lg overflow-hidden bg-white dark:divide-border dark:border-border dark:bg-card">
       {rows.map((r) => (
-        <li key={r.item_id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 py-2.5 hover:bg-stone-50/80">
+        <li key={r.item_id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 py-2.5 hover:bg-stone-50/80 dark:hover:bg-muted/50">
           <div className="min-w-0">
             <Link
               to={`/auctions/${r.item_id}`}
-              className="font-medium text-gray-900 hover:text-orange-600 truncate block"
+              className="font-medium text-gray-900 dark:text-foreground hover:text-orange-600 dark:hover:text-orange-400 truncate block"
             >
               {r.title}
             </Link>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">
               Your high bid {formatMoney(r.my_highest_bid)} · Listing {formatMoney(r.current_price)}
               {r.status === 'active' && r.end_time ? (
-                <span className="text-gray-400"> · ends {new Date(r.end_time).toLocaleString()}</span>
+                <span className="text-gray-400 dark:text-gray-500"> · ends {new Date(r.end_time).toLocaleString()}</span>
               ) : null}
             </p>
           </div>
-          <Button asChild variant="outline" size="sm" className="shrink-0 border-orange-200 text-orange-800 hover:bg-orange-50">
+          <Button asChild variant="outline" size="sm" className="shrink-0 border-orange-200 text-orange-800 hover:bg-orange-50 dark:border-orange-800 dark:text-orange-200 dark:hover:bg-orange-950/50">
             <Link to={`/auctions/${r.item_id}`}>View auction</Link>
           </Button>
         </li>
@@ -48,17 +48,17 @@ function BidRowList({ rows, empty }: { rows: MyBidRow[]; empty: string }) {
 
 function PurchaseList({ rows }: { rows: MyPurchaseRow[] }) {
   if (rows.length === 0) {
-    return <p className="text-sm text-gray-500">No completed purchases yet.</p>
+    return <p className="text-sm text-gray-500 dark:text-muted-foreground">No completed purchases yet.</p>
   }
   return (
-    <ul className="divide-y divide-stone-100 border border-stone-200 rounded-lg overflow-hidden bg-white">
+    <ul className="divide-y divide-stone-100 border border-stone-200 rounded-lg overflow-hidden bg-white dark:divide-border dark:border-border dark:bg-card">
       {rows.map((p) => (
-        <li key={p.order_id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 py-2.5">
+        <li key={p.order_id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 py-2.5 dark:hover:bg-muted/30">
           <div className="min-w-0">
-            <Link to={`/auctions/${p.item_id}`} className="font-medium text-gray-900 hover:text-orange-600 truncate block">
+            <Link to={`/auctions/${p.item_id}`} className="font-medium text-gray-900 dark:text-foreground hover:text-orange-600 dark:hover:text-orange-400 truncate block">
               {p.item_title}
             </Link>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">
               {formatMoney(p.amount_paid)} · {new Date(p.paid_at).toLocaleString()} · Order #{p.order_id}
             </p>
           </div>
@@ -99,7 +99,7 @@ export function MyAuctionsPage() {
 
   if (phase === 'loading') {
     return (
-      <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-10 flex items-center gap-2 text-gray-600 text-sm">
+      <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-10 flex items-center gap-2 text-gray-600 dark:text-muted-foreground text-sm">
         <Loader2 className="h-4 w-4 animate-spin" />
         Loading your auctions…
       </main>
@@ -109,7 +109,7 @@ export function MyAuctionsPage() {
   if (phase === 'unauth') {
     return (
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-10 space-y-4">
-        <p className="text-gray-900 text-sm">Sign in to see auctions you have bid on and items you have purchased.</p>
+        <p className="text-gray-900 dark:text-foreground text-sm">Sign in to see auctions you have bid on and items you have purchased.</p>
         <Button asChild className="bg-orange-500 hover:bg-orange-400 text-white">
           <Link to="/">Back to home</Link>
         </Button>
@@ -120,7 +120,7 @@ export function MyAuctionsPage() {
   if (phase === 'error' || !data) {
     return (
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-10 space-y-4">
-        <p className="text-gray-900 text-sm">{message ?? 'Something went wrong.'}</p>
+        <p className="text-gray-900 dark:text-foreground text-sm">{message ?? 'Something went wrong.'}</p>
         <Button asChild variant="outline">
           <Link to="/">Back home</Link>
         </Button>
@@ -131,16 +131,16 @@ export function MyAuctionsPage() {
   return (
     <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-10 space-y-8">
       <div className="flex flex-wrap items-center gap-2 text-sm">
-        <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium">
+        <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium dark:text-orange-400 dark:hover:text-orange-300">
           ← Home
         </Link>
-        <span className="text-gray-300">/</span>
-        <span className="text-gray-600">My bids & purchases</span>
+        <span className="text-gray-300 dark:text-muted-foreground">/</span>
+        <span className="text-gray-600 dark:text-muted-foreground">My bids & purchases</span>
       </div>
 
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">My bids & purchases</h1>
-        <p className="text-sm text-gray-600 mt-1">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-foreground">My bids & purchases</h1>
+        <p className="text-sm text-gray-600 dark:text-muted-foreground mt-1">
           Live auctions you are in, wins that need payment (pay from the auction page), other auctions you bid on, and
           completed orders.
         </p>
@@ -149,8 +149,8 @@ export function MyAuctionsPage() {
       <Card>
         <CardHeader className="pb-2">
           <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-emerald-100 p-2">
-              <Gavel className="h-5 w-5 text-emerald-700" />
+            <div className="rounded-lg bg-emerald-100 p-2 dark:bg-emerald-950/50">
+              <Gavel className="h-5 w-5 text-emerald-700 dark:text-emerald-400" />
             </div>
             <div>
               <CardTitle className="text-base">Live — you are bidding</CardTitle>
@@ -166,8 +166,8 @@ export function MyAuctionsPage() {
       <Card>
         <CardHeader className="pb-2">
           <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-orange-100 p-2">
-              <Trophy className="h-5 w-5 text-orange-700" />
+            <div className="rounded-lg bg-orange-100 p-2 dark:bg-orange-950/50">
+              <Trophy className="h-5 w-5 text-orange-700 dark:text-orange-400" />
             </div>
             <div>
               <CardTitle className="text-base">You won — complete payment</CardTitle>
@@ -183,8 +183,8 @@ export function MyAuctionsPage() {
       <Card>
         <CardHeader className="pb-2">
           <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-stone-100 p-2">
-              <Gavel className="h-5 w-5 text-stone-600" />
+            <div className="rounded-lg bg-stone-100 p-2 dark:bg-muted/50">
+              <Gavel className="h-5 w-5 text-stone-600 dark:text-muted-foreground" />
             </div>
             <div>
               <CardTitle className="text-base">Other auctions you bid on</CardTitle>
@@ -200,8 +200,8 @@ export function MyAuctionsPage() {
       <Card>
         <CardHeader className="pb-2">
           <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-blue-100 p-2">
-              <Package className="h-5 w-5 text-blue-700" />
+            <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-950/50">
+              <Package className="h-5 w-5 text-blue-700 dark:text-blue-400" />
             </div>
             <div>
               <CardTitle className="text-base">Purchased</CardTitle>
@@ -214,9 +214,9 @@ export function MyAuctionsPage() {
         </CardContent>
       </Card>
 
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-gray-600 dark:text-muted-foreground">
         Selling?{' '}
-        <Link to="/my/listings" className="font-medium text-orange-600 hover:text-orange-700">
+        <Link to="/my/listings" className="font-medium text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300">
           View all your listings
         </Link>
         .

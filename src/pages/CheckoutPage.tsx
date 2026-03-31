@@ -93,7 +93,7 @@ export function CheckoutPage() {
   if (!auctionId) {
     return (
       <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10 space-y-4">
-        <p className="text-gray-900 text-sm">Invalid checkout link.</p>
+        <p className="text-gray-900 dark:text-foreground text-sm">Invalid checkout link.</p>
         <Button asChild variant="outline">
           <Link to="/">Back home</Link>
         </Button>
@@ -103,7 +103,7 @@ export function CheckoutPage() {
 
   if (phase === 'loading') {
     return (
-      <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10 flex items-center gap-2 text-gray-600 text-sm">
+      <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10 flex items-center gap-2 text-gray-600 dark:text-muted-foreground text-sm">
         <Loader2 className="h-4 w-4 animate-spin" />
         Loading checkout…
       </main>
@@ -114,7 +114,7 @@ export function CheckoutPage() {
     return (
       <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10 space-y-4">
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium">
+          <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium dark:text-orange-400 dark:hover:text-orange-300">
             ← Home
           </Link>
         </div>
@@ -136,7 +136,7 @@ export function CheckoutPage() {
     return (
       <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10 space-y-6">
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium">
+          <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium dark:text-orange-400 dark:hover:text-orange-300">
             ← Home
           </Link>
         </div>
@@ -157,26 +157,26 @@ export function CheckoutPage() {
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div className="flex justify-between gap-2">
-              <span className="text-gray-600 shrink-0">Order</span>
-              <span className="font-mono text-gray-900 text-right">#{receipt.orderId}</span>
+              <span className="text-gray-600 dark:text-muted-foreground shrink-0">Order</span>
+              <span className="font-mono text-gray-900 dark:text-foreground text-right">#{receipt.orderId}</span>
             </div>
             <div className="flex justify-between gap-2">
-              <span className="text-gray-600 shrink-0">Item</span>
-              <span className="text-gray-900 text-right max-w-[14rem]">{receipt.itemTitle}</span>
+              <span className="text-gray-600 dark:text-muted-foreground shrink-0">Item</span>
+              <span className="text-gray-900 dark:text-foreground text-right max-w-[14rem]">{receipt.itemTitle}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Amount paid</span>
-              <span className="font-semibold tabular-nums text-gray-900">
+              <span className="text-gray-600 dark:text-muted-foreground">Amount paid</span>
+              <span className="font-semibold tabular-nums text-gray-900 dark:text-foreground">
                 {formatMoney(receipt.amountPaid, checkout?.currency ?? APP_CURRENCY)}
               </span>
             </div>
             <div className="flex justify-between gap-2 items-start">
-              <span className="text-gray-600 shrink-0">Ship to</span>
-              <span className="text-gray-900 text-right text-xs max-w-[16rem]">{receipt.shippingAddress}</span>
+              <span className="text-gray-600 dark:text-muted-foreground shrink-0">Ship to</span>
+              <span className="text-gray-900 dark:text-foreground text-right text-xs max-w-[16rem]">{receipt.shippingAddress}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Shipping</span>
-              <span className="text-gray-900">
+              <span className="text-gray-600 dark:text-muted-foreground">Shipping</span>
+              <span className="text-gray-900 dark:text-foreground">
                 {receipt.expeditedShipping ? 'Expedited' : 'Standard'} · est. {receipt.shippingTimeDays}{' '}
                 day{receipt.shippingTimeDays === 1 ? '' : 's'}
               </span>
@@ -184,7 +184,7 @@ export function CheckoutPage() {
             {receipt.message ? (
               <p className="text-xs text-emerald-900/90 border-t border-emerald-200/60 pt-2">{receipt.message}</p>
             ) : null}
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-muted-foreground">
               Paid {new Date(receipt.paidAt).toLocaleString()}
             </p>
             <Button asChild className="w-full bg-orange-500 hover:bg-orange-400 text-white font-semibold mt-2">
@@ -198,7 +198,7 @@ export function CheckoutPage() {
 
   if (!checkout) {
     return (
-      <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10 flex items-center gap-2 text-gray-600 text-sm">
+      <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10 flex items-center gap-2 text-gray-600 dark:text-muted-foreground text-sm">
         <Loader2 className="h-4 w-4 animate-spin" />
         Loading checkout…
       </main>
@@ -208,11 +208,11 @@ export function CheckoutPage() {
   return (
     <main className="flex-1 max-w-lg mx-auto w-full px-4 py-10 space-y-6">
       <div className="flex flex-wrap items-center gap-2 text-sm">
-        <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium">
+        <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium dark:text-orange-400 dark:hover:text-orange-300">
           ← Home
         </Link>
-        <span className="text-gray-300">/</span>
-        <span className="text-gray-600">Checkout</span>
+        <span className="text-gray-300 dark:text-muted-foreground">/</span>
+        <span className="text-gray-600 dark:text-muted-foreground">Checkout</span>
       </div>
 
       <Card>
@@ -231,12 +231,12 @@ export function CheckoutPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <p className="text-sm font-medium text-gray-900">{checkout.title}</p>
-            <p className="text-xs text-gray-500 mt-1">Auction #{checkout.auctionId}</p>
+            <p className="text-sm font-medium text-gray-900 dark:text-foreground">{checkout.title}</p>
+            <p className="text-xs text-gray-500 dark:text-muted-foreground mt-1">Auction #{checkout.auctionId}</p>
           </div>
 
           {checkout.expeditedShippingFee > 0 && (
-            <label className="flex items-start gap-3 rounded-lg border border-stone-200 bg-white px-3 py-2.5 cursor-pointer">
+            <label className="flex items-start gap-3 rounded-lg border border-stone-200 bg-white px-3 py-2.5 cursor-pointer dark:border-border dark:bg-card">
               <input
                 type="checkbox"
                 checked={expeditedShipping}
@@ -244,33 +244,33 @@ export function CheckoutPage() {
                 className="mt-1 rounded border-gray-300"
               />
               <span className="text-sm">
-                <span className="font-medium text-gray-900">Expedited shipping</span>
-                <span className="text-gray-600 block text-xs mt-0.5">
+                <span className="font-medium text-gray-900 dark:text-foreground">Expedited shipping</span>
+                <span className="text-gray-600 dark:text-muted-foreground block text-xs mt-0.5">
                   Add {formatMoney(checkout.expeditedShippingFee, checkout.currency)} to your total
                 </span>
               </span>
             </label>
           )}
 
-          <div className="rounded-lg border border-stone-200 bg-stone-50/80 p-3 text-sm space-y-2">
+          <div className="rounded-lg border border-stone-200 bg-stone-50/80 p-3 text-sm space-y-2 dark:border-border dark:bg-muted/40">
             <div className="flex justify-between">
-              <span className="text-gray-600">Winning bid (item)</span>
+              <span className="text-gray-600 dark:text-muted-foreground">Winning bid (item)</span>
               <span className="tabular-nums font-medium">{formatMoney(checkout.itemPrice, checkout.currency)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Shipping option</span>
+              <span className="text-gray-600 dark:text-muted-foreground">Shipping option</span>
               <span className="tabular-nums font-medium">
                 {expeditedShipping
                   ? formatMoney(checkout.expeditedShippingFee, checkout.currency)
                   : formatMoney(0, checkout.currency)}
               </span>
             </div>
-            <Separator className="bg-stone-200" />
+            <Separator className="bg-stone-200 dark:bg-border" />
             <div className="flex justify-between text-base">
-              <span className="font-semibold text-gray-900">Total</span>
-              <span className="font-bold tabular-nums text-gray-900">{formatMoney(total, checkout.currency)}</span>
+              <span className="font-semibold text-gray-900 dark:text-foreground">Total</span>
+              <span className="font-bold tabular-nums text-gray-900 dark:text-foreground">{formatMoney(total, checkout.currency)}</span>
             </div>
-            <p className="text-xs text-gray-500 pt-1">
+            <p className="text-xs text-gray-500 dark:text-muted-foreground pt-1">
               Ship to: {checkout.shippingAddressSummary}
             </p>
             {!checkout.hasShippingAddress && (
@@ -293,7 +293,7 @@ export function CheckoutPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <label htmlFor="nameOnCard" className="text-xs font-medium text-gray-700">
+              <label htmlFor="nameOnCard" className="text-xs font-medium text-gray-700 dark:text-gray-300">
                 Name on card
               </label>
               <Input
@@ -306,7 +306,7 @@ export function CheckoutPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <label htmlFor="cardNumber" className="text-xs font-medium text-gray-700">
+              <label htmlFor="cardNumber" className="text-xs font-medium text-gray-700 dark:text-gray-300">
                 Card number
               </label>
               <Input
@@ -321,13 +321,13 @@ export function CheckoutPage() {
                 placeholder="4242424242424242"
                 maxLength={19}
               />
-              <p className="text-[11px] text-gray-500">
+              <p className="text-[11px] text-gray-500 dark:text-muted-foreground">
                 13–19 digits, expiry as MM/YY, and a 3–4 digit security code (e.g. 4111 1111 1111 1111 for testing).
               </p>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label htmlFor="expiry" className="text-xs font-medium text-gray-700">
+                <label htmlFor="expiry" className="text-xs font-medium text-gray-700 dark:text-gray-300">
                   Expires
                 </label>
                 <Input
@@ -344,7 +344,7 @@ export function CheckoutPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label htmlFor="cvv" className="text-xs font-medium text-gray-700">
+                <label htmlFor="cvv" className="text-xs font-medium text-gray-700 dark:text-gray-300">
                   CVC
                 </label>
                 <Input
@@ -392,7 +392,7 @@ export function CheckoutPage() {
             </Button>
           </form>
 
-          <Button asChild variant="ghost" className="w-full text-gray-600">
+          <Button asChild variant="ghost" className="w-full text-gray-600 dark:text-muted-foreground">
             <Link to={`/auctions/${checkout.auctionId}`}>Cancel</Link>
           </Button>
         </CardContent>

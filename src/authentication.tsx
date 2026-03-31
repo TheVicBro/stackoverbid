@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { ThemeToggleMuted } from "@/theme/ThemeProvider"
 
 //Gather token response
 
@@ -133,7 +134,10 @@ export default function Authentication(props: { onAuthed?: () => void, onCancel?
   }
 
   return (
-    <div className="min-h-screen bg-stone-100 text-gray-900 flex items-center justify-center p-4">
+    <div className="relative min-h-screen bg-stone-100 text-gray-900 flex items-center justify-center p-4 dark:bg-background dark:text-foreground">
+      <div className="absolute top-4 right-4 z-10">
+        <ThemeToggleMuted />
+      </div>
       <Card className="w-full max-w-md">
         <CardContent className="p-6 space-y-4">
           <div className="space-y-1">

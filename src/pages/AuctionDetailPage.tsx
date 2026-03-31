@@ -105,7 +105,7 @@ export function AuctionDetailPage() {
   if (!auctionId) {
     return (
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-10 space-y-4">
-        <p className="text-gray-900 text-sm">Missing auction id.</p>
+        <p className="text-gray-900 dark:text-foreground text-sm">Missing auction id.</p>
         <Button asChild variant="outline">
           <Link to="/">Back home</Link>
         </Button>
@@ -116,7 +116,7 @@ export function AuctionDetailPage() {
   if (loading && !auction) {
     return (
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-10">
-        <p className="text-gray-600 text-sm">Loading auction…</p>
+        <p className="text-gray-600 dark:text-muted-foreground text-sm">Loading auction…</p>
       </main>
     )
   }
@@ -124,7 +124,7 @@ export function AuctionDetailPage() {
   if (loadError || !auction) {
     return (
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-10">
-        <p className="text-red-700 text-sm">{loadError ?? 'Auction not found.'}</p>
+        <p className="text-red-700 dark:text-red-400 text-sm">{loadError ?? 'Auction not found.'}</p>
         <Button asChild variant="outline" className="mt-4">
           <Link to="/">Back home</Link>
         </Button>
@@ -135,15 +135,15 @@ export function AuctionDetailPage() {
   return (
     <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-8 space-y-6">
       <div className="flex flex-wrap items-center gap-2 text-sm">
-        <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium">
+        <Link to="/" className="text-orange-600 hover:text-orange-700 font-medium dark:text-orange-400 dark:hover:text-orange-300">
           ← Home
         </Link>
-        <span className="text-gray-300">/</span>
-        <span className="text-gray-600 truncate">{auction.title}</span>
+        <span className="text-gray-300 dark:text-muted-foreground">/</span>
+        <span className="text-gray-600 dark:text-muted-foreground truncate">{auction.title}</span>
       </div>
 
       {auction.viewerIsSeller && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50/90 px-3 py-2 text-xs text-amber-950 space-y-2">
+        <div className="rounded-lg border border-amber-200 bg-amber-50/90 px-3 py-2 text-xs text-amber-950 space-y-2 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-100">
           <p>
             You are viewing this listing as the <strong>seller</strong>. Bidders see the standard auction page without
             this notice.
@@ -151,11 +151,11 @@ export function AuctionDetailPage() {
           {auction.status === 'LIVE' && (
             <div className="flex flex-wrap items-center gap-2 pt-0.5">
               {auction.hasBids ? (
-                <p className="text-amber-900/90">
+                <p className="text-amber-900/90 dark:text-amber-200">
                   Title and description are locked after the first bid. You can still monitor bids below.
                 </p>
               ) : (
-                <Button asChild variant="outline" size="sm" className="border-amber-300 text-amber-950 hover:bg-amber-100">
+                <Button asChild variant="outline" size="sm" className="border-amber-300 text-amber-950 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-100 dark:hover:bg-amber-950/50">
                   <Link to={`/auctions/${auctionId}/edit`}>
                     <Pencil className="h-3.5 w-3.5 mr-1.5" />
                     Edit listing
@@ -179,7 +179,7 @@ export function AuctionDetailPage() {
                     <Link
                       key={tag}
                       to={`/search?q=${encodeURIComponent(tag)}`}
-                      className="text-xs font-medium rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1 text-stone-700 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-900 transition-colors"
+                      className="text-xs font-medium rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1 text-stone-700 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-900 transition-colors dark:border-border dark:bg-muted/50 dark:text-foreground dark:hover:border-orange-600 dark:hover:bg-orange-950/40 dark:hover:text-orange-200"
                     >
                       {tag}
                     </Link>
@@ -205,11 +205,11 @@ export function AuctionDetailPage() {
         <CardContent className="space-y-6">
           {gallery.length > 0 ? (
             <div className="space-y-2">
-              <div className="relative aspect-video rounded-lg overflow-hidden bg-stone-100 border border-stone-200">
+              <div className="relative aspect-video rounded-lg overflow-hidden bg-stone-100 border border-stone-200 dark:bg-muted/40 dark:border-border">
                 <img
                   src={gallery[activeImageIndex]}
                   alt=""
-                  className="h-full w-full object-contain bg-stone-50"
+                  className="h-full w-full object-contain bg-stone-50 dark:bg-muted/30"
                 />
                 {gallery.length > 1 && (
                   <>
@@ -254,25 +254,25 @@ export function AuctionDetailPage() {
               )}
             </div>
           ) : (
-            <div className="aspect-video rounded-lg bg-stone-200 border border-stone-100 flex items-center justify-center text-stone-400 text-sm">
+            <div className="aspect-video rounded-lg bg-stone-200 border border-stone-100 flex items-center justify-center text-stone-400 text-sm dark:bg-muted dark:border-border dark:text-muted-foreground">
               No photos for this listing
             </div>
           )}
 
           {auction.status === 'LIVE' && (
             <div className="grid sm:grid-cols-3 gap-4 text-sm">
-              <div className="rounded-lg bg-stone-50 border border-stone-100 p-3">
-                <p className="text-gray-500 text-xs font-medium uppercase">Current bid</p>
-                <p className="text-2xl font-bold text-gray-900 tabular-nums">{formatMoney(auction.currentBid)}</p>
+              <div className="rounded-lg bg-stone-50 border border-stone-100 p-3 dark:bg-muted/40 dark:border-border">
+                <p className="text-gray-500 dark:text-muted-foreground text-xs font-medium uppercase">Current bid</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-foreground tabular-nums">{formatMoney(auction.currentBid)}</p>
               </div>
-              <div className="rounded-lg bg-stone-50 border border-stone-100 p-3">
-                <p className="text-gray-500 text-xs font-medium uppercase">Min. next bid</p>
-                <p className="text-2xl font-bold text-orange-600 tabular-nums">{formatMoney(minNextBid)}</p>
+              <div className="rounded-lg bg-stone-50 border border-stone-100 p-3 dark:bg-muted/40 dark:border-border">
+                <p className="text-gray-500 dark:text-muted-foreground text-xs font-medium uppercase">Min. next bid</p>
+                <p className="text-2xl font-bold text-orange-600 dark:text-orange-400 tabular-nums">{formatMoney(minNextBid)}</p>
               </div>
-              <div className="rounded-lg bg-stone-50 border border-stone-100 p-3">
-                <p className="text-gray-500 text-xs font-medium uppercase">Time left</p>
-                <p className="text-xl font-semibold text-gray-900">{timeLeft(auction.endsAt)}</p>
-                <p className="text-xs text-gray-400 mt-1">Updates every few seconds.</p>
+              <div className="rounded-lg bg-stone-50 border border-stone-100 p-3 dark:bg-muted/40 dark:border-border">
+                <p className="text-gray-500 dark:text-muted-foreground text-xs font-medium uppercase">Time left</p>
+                <p className="text-xl font-semibold text-gray-900 dark:text-foreground">{timeLeft(auction.endsAt)}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Updates every few seconds.</p>
               </div>
             </div>
           )}
@@ -281,17 +281,17 @@ export function AuctionDetailPage() {
             <>
               <Separator />
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
                   <Gavel className="h-4 w-4 text-orange-500" />
                   Place a bid
                 </h3>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-muted-foreground mt-1">
                   Enter at least the minimum next bid. You will see a confirmation or an error if the auction has moved
                   on.
                 </p>
                 <form onSubmit={handlePlaceBid} className="mt-4 flex flex-col sm:flex-row gap-3 sm:items-end">
                   <div className="flex-1 space-y-1.5">
-                    <label htmlFor="bid" className="text-xs font-medium text-gray-700">
+                    <label htmlFor="bid" className="text-xs font-medium text-gray-700 dark:text-gray-300">
                       Your bid ({formatMoney(minNextBid)} or higher)
                     </label>
                     <Input
@@ -321,7 +321,7 @@ export function AuctionDetailPage() {
                 {bidError && (
                   <div
                     role="alert"
-                    className="mt-4 flex gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900"
+                    className="mt-4 flex gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200"
                   >
                     <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
                     <span>{bidError}</span>
@@ -330,7 +330,7 @@ export function AuctionDetailPage() {
                 {bidSuccess && (
                   <div
                     role="status"
-                    className="mt-4 flex gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900"
+                    className="mt-4 flex gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-200"
                   >
                     <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" />
                     <span>Bid placed successfully. The page will refresh with the latest amounts.</span>
@@ -359,24 +359,24 @@ function ClosedAuctionSection({ auction }: { auction: AuctionDetail }) {
   if (auction.viewerIsSeller) {
     return (
       <div className="space-y-3">
-        <h3 className="text-sm font-semibold text-gray-900">Your listing</h3>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-foreground">Your listing</h3>
         {isUnsold && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-100">
             This item did not receive any bids before the auction ended. You can{' '}
-            <Link to="/sell" className="font-medium text-amber-900 underline hover:text-orange-700">
+            <Link to="/sell" className="font-medium text-amber-900 underline hover:text-orange-700 dark:text-amber-200 dark:hover:text-orange-300">
               create a new listing
             </Link>{' '}
             anytime.
           </div>
         )}
         {isSold && !auction.isPaid && (
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-950">
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-950 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-100">
             Your item sold for <strong>{formatMoney(auction.currentBid)}</strong>. The buyer has an unpaid order until they
             complete checkout.
           </div>
         )}
         {isSold && auction.isPaid && (
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-950">
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-950 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-100">
             Your item sold for <strong>{formatMoney(auction.currentBid)}</strong>. Payment has been completed.
           </div>
         )}
@@ -386,7 +386,7 @@ function ClosedAuctionSection({ auction }: { auction: AuctionDetail }) {
 
   if (isUnsold) {
     return (
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-gray-600 dark:text-muted-foreground">
         This auction ended with no winning bid. Watch for similar listings on the marketplace.
       </p>
     )
@@ -395,11 +395,11 @@ function ClosedAuctionSection({ auction }: { auction: AuctionDetail }) {
   if (isSold && auction.viewerIsWinner) {
     if (auction.isPaid) {
       return (
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-4 flex gap-3">
-          <CheckCircle2 className="h-8 w-8 text-emerald-600 shrink-0" />
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-4 flex gap-3 dark:border-emerald-900/50 dark:bg-emerald-950/40">
+          <CheckCircle2 className="h-8 w-8 text-emerald-600 shrink-0 dark:text-emerald-400" />
           <div>
-            <p className="font-semibold text-gray-900">You won — payment complete</p>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="font-semibold text-gray-900 dark:text-foreground">You won — payment complete</p>
+            <p className="text-sm text-gray-600 dark:text-muted-foreground mt-1">
               Final price <strong>{formatMoney(auction.currentBid)}</strong>. Thank you for your purchase.
             </p>
           </div>
@@ -410,14 +410,14 @@ function ClosedAuctionSection({ auction }: { auction: AuctionDetail }) {
       <div
         className={cn(
           'rounded-lg border px-4 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4',
-          'border-orange-200 bg-orange-50'
+          'border-orange-200 bg-orange-50 dark:border-orange-900/50 dark:bg-orange-950/40'
         )}
       >
         <div className="flex gap-3">
-          <Trophy className="h-8 w-8 text-orange-500 shrink-0" />
+          <Trophy className="h-8 w-8 text-orange-500 shrink-0 dark:text-orange-400" />
           <div>
-            <p className="font-semibold text-gray-900">You won this auction</p>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="font-semibold text-gray-900 dark:text-foreground">You won this auction</p>
+            <p className="text-sm text-gray-600 dark:text-muted-foreground mt-1">
               Final price <strong>{formatMoney(auction.currentBid)}</strong>. Complete checkout to pay for your item.
             </p>
           </div>
@@ -431,7 +431,7 @@ function ClosedAuctionSection({ auction }: { auction: AuctionDetail }) {
 
   if (isSold) {
     return (
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-gray-600 dark:text-muted-foreground">
         This auction closed at <strong>{formatMoney(auction.currentBid)}</strong>. Another bidder won this item.
       </p>
     )

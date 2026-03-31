@@ -7,6 +7,18 @@
     <title>stackoverbid</title>
   </head>
   <body>
+    <!-- Align with next-themes storageKey + values: light | dark | system (default / missing → OS) -->
+    <script>
+      (function () {
+        try {
+          var k = 'stackoverbid-theme'
+          var s = localStorage.getItem(k)
+          var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+          var dark = s === 'dark' || ((s === 'system' || s === null) && systemDark)
+          document.documentElement.classList.toggle('dark', dark)
+        } catch (e) {}
+      })()
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
