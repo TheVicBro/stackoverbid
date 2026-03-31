@@ -1,7 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { format } from 'date-fns'
-import { CalendarIcon, X, ImagePlus, Loader2, Sparkles } from 'lucide-react'
+import {
+  CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+  GripVertical,
+  ImagePlus,
+  Loader2,
+  Sparkles,
+  X,
+} from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,6 +40,7 @@ export function CreateAuctionPage() {
   const [uploadingImages, setUploadingImages] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const dragPhotoIndexRef = useRef<number | null>(null)
 
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [tagSuggesting, setTagSuggesting] = useState(false)
@@ -66,7 +76,7 @@ export function CreateAuctionPage() {
             if (!res.ok || !data.secure_url) {
               throw new Error(data.error?.message ?? `Upload failed (${res.status})`)
             }
-            return data.secure_url
+            return data.secure_url as string
           })
         )
         setImageUrls((prev) => [...prev, ...uploaded])
@@ -101,6 +111,17 @@ export function CreateAuctionPage() {
 
   function removeImageAt(index: number) {
     setImageUrls((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  function movePhoto(from: number, to: number) {
+    if (from === to || from < 0 || to < 0) return
+    setImageUrls((prev) => {
+      if (from >= prev.length || to >= prev.length) return prev
+      const next = [...prev]
+      const [item] = next.splice(from, 1)
+      next.splice(to, 0, item)
+      return next
+    })
   }
 
   function toggleTag(tag: string) {
@@ -217,8 +238,8 @@ export function CreateAuctionPage() {
         </p>
       </div>
 
-      <Card>
-        <CardContent className="p-6">
+      <Card className="gap-0 py-0 shadow-sm">
+        <CardContent className="py-6">
           <form onSubmit={onSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
@@ -243,7 +264,8 @@ export function CreateAuctionPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Photos (optional)</label>
               <p className="text-xs text-gray-500 mb-2">
-                Drag and drop images here, or click to browse. You can add several. Requires Cloudinary env vars in production.
+                Drag files here or click to upload. The <strong>first</strong> image is the cover on listings — drag
+                thumbnails to reorder, or use the arrows on each photo.
               </p>
               <input
                 ref={fileInputRef}
@@ -296,33 +318,97 @@ export function CreateAuctionPage() {
               {imageUrls.length > 0 && (
                 <ul className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {imageUrls.map((url, i) => (
-                    <li key={`${url}-${i}`} className="relative group aspect-square rounded-md overflow-hidden border border-gray-200 bg-stone-100">
-                      <img src={url} alt="" className="h-full w-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          removeImageAt(i)
-                        }}
-                        className="absolute top-1 right-1 rounded-full bg-gray-900/75 p-1 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-900"
-                        aria-label="Remove photo"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
+                    <li
+                      key={url}
+                      draggable
+                      onDragStart={(e) => {
+                        dragPhotoIndexRef.current = i
+                        e.dataTransfer.effectAllowed = 'move'
+                        e.dataTransfer.setData('text/plain', String(i))
+                      }}
+                      onDragEnd={() => {
+                        dragPhotoIndexRef.current = null
+                      }}
+                      onDragOver={(e) => {
+                        e.preventDefault()
+                        e.dataTransfer.dropEffect = 'move'
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault()
+                        const from = dragPhotoIndexRef.current
+                        dragPhotoIndexRef.current = null
+                        if (from === null || from === i) return
+                        movePhoto(from, i)
+                      }}
+                      className="relative group flex flex-col rounded-md overflow-hidden border border-gray-200 bg-stone-100 shadow-sm"
+                    >
+                      <div className="relative aspect-square w-full shrink-0">
+                        <img src={url} alt="" className="h-full w-full object-cover pointer-events-none" />
+                        <div
+                          className="absolute left-1 top-1 flex items-center gap-0.5 rounded bg-gray-900/70 text-white px-1 py-0.5 cursor-grab active:cursor-grabbing"
+                          title="Drag to reorder"
+                          aria-hidden
+                        >
+                          <GripVertical className="h-4 w-4" />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            removeImageAt(i)
+                          }}
+                          className="absolute top-1 right-1 rounded-full bg-gray-900/75 p-1 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-900"
+                          aria-label="Remove photo"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                        {i === 0 && (
+                          <span className="absolute bottom-1 left-1 rounded bg-orange-600/95 text-white text-[10px] font-semibold px-1.5 py-0.5">
+                            Cover
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-center gap-1 border-t border-stone-200 bg-white py-1">
+                        <button
+                          type="button"
+                          disabled={i === 0}
+                          onClick={() => movePhoto(i, i - 1)}
+                          className="rounded p-1 text-gray-600 hover:bg-stone-100 disabled:opacity-30 disabled:pointer-events-none"
+                          aria-label="Move photo earlier"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="button"
+                          disabled={i === imageUrls.length - 1}
+                          onClick={() => movePhoto(i, i + 1)}
+                          className="rounded p-1 text-gray-600 hover:bg-stone-100 disabled:opacity-30 disabled:pointer-events-none"
+                          aria-label="Move photo later"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      </div>
                     </li>
                   ))}
                 </ul>
               )}
             </div>
 
-            <div className="rounded-lg border border-stone-200 bg-stone-50/50 p-4 space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <label className="text-sm font-medium text-gray-800">Categories (optional)</label>
+            <div className="rounded-lg border border-orange-200/90 bg-gradient-to-br from-orange-50/90 to-stone-50/80 p-4 space-y-3">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0 space-y-1">
+                  <h2 className="text-sm font-semibold text-gray-900">Gemini listing assistant</h2>
+                  <p className="text-xs text-gray-600 max-w-xl leading-relaxed">
+                    Suggests <strong>title</strong>, <strong>description</strong>, and <strong>categories</strong> from
+                    your draft and up to four photos (in the order shown above). Nothing is sent until you click — then
+                    review and edit before publishing.
+                  </p>
+                </div>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="shrink-0 border-orange-200 text-orange-900 hover:bg-orange-50"
+                  className="shrink-0 border-orange-300 bg-white text-orange-950 hover:bg-orange-50"
                   disabled={tagSuggesting}
                   onClick={() => void runSuggestFromGemini()}
                 >
@@ -334,12 +420,15 @@ export function CreateAuctionPage() {
                   Suggest with Gemini
                 </Button>
               </div>
+              {tagHint && <p className="text-xs text-emerald-900 bg-emerald-50/80 border border-emerald-200/60 rounded-md px-2.5 py-2">{tagHint}</p>}
+            </div>
+
+            <div className="rounded-lg border border-stone-200 bg-stone-50/50 p-4 space-y-3">
+              <label className="text-sm font-medium text-gray-800">Categories (optional)</label>
               <p className="text-xs text-gray-600">
-                Gemini uses your <strong>title</strong>, <strong>description</strong>, and up to <strong>four uploaded
-                photos</strong> (HTTPS URLs we fetch on the server). Nothing is sent until you click the button. Tags
-                match the category bar — pick up to five manually or merge with suggestions.
+                Same labels as the category bar under the header. Pick up to five, or merge with Gemini suggestions from
+                the assistant above.
               </p>
-              {tagHint && <p className="text-xs text-emerald-800">{tagHint}</p>}
               <div className="flex flex-wrap gap-2">
                 {MARKETPLACE_NAV_TAGS.map((tag) => {
                   const on = selectedTags.includes(tag)
