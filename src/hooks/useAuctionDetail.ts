@@ -25,6 +25,8 @@ async function fetchAuction(auctionId: string): Promise<AuctionDetail> {
 
   const highestBidderId = item.highest_bidder_id as number | null | undefined
   const sellerId = item.seller_id as number
+  const startingPrice = typeof item.starting_price === 'number' ? item.starting_price : Number(item.starting_price)
+  const hasBids = highestBidderId != null
 
   let outcome: AuctionOutcome | undefined
   if (!isLive) {
@@ -46,8 +48,10 @@ async function fetchAuction(auctionId: string): Promise<AuctionDetail> {
     description: item.description,
     imageUrls,
     currentBid: item.current_price,
+    startingPrice: Number.isFinite(startingPrice) ? startingPrice : item.current_price,
     minIncrement: 1,
     bidCount: 0,
+    hasBids,
     endsAt: item.end_time,
     status: isLive ? 'LIVE' : 'CLOSED',
     outcome,

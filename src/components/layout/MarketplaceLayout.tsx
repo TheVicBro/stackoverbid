@@ -1,6 +1,6 @@
 import { Link, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { Gavel } from 'lucide-react'
+import { Gavel, Store } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
@@ -47,9 +47,6 @@ export function MarketplaceLayout() {
   const [showAuth, setShowAuth] = useState<false | "login" | "signup">(false)
   const [loadingAuth, setLoadingAuth] = useState(true)
   const [user, setUser] = useState<{id: number, username: string, first_name: string, last_name: string} | null>(null)
-  const [myListings, setMyListings] = useState<
-    { id: number; title: string; current_price: number; status: string }[]
-  >([])
   const [profileOpen, setProfileOpen] = useState(false)
   
   const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "/api"
@@ -65,36 +62,8 @@ export function MarketplaceLayout() {
   async function handleLogout() {
     await fetch(`${API_BASE}/auth/logout`, { method: "POST", credentials: "include" })
     setUser(null)
-    setMyListings([])
     setProfileOpen(false)
     setShowAuth(false)
-  }
-
-  async function openProfile() {
-    setProfileOpen(true)
-    if (!user) return
-    try {
-      const res = await fetch(`${API_BASE}/catalogue/items?seller_id=${user.id}`, {
-        credentials: "include",
-        cache: "no-store",
-      })
-      if (res.ok) {
-        const rows = (await res.json()) as {
-          id: number
-          title: string
-          current_price: number
-          status: string
-        }[]
-        setMyListings(
-          rows.map((r) => ({
-            id: r.id,
-            title: r.title,
-            current_price: r.current_price,
-            status: r.status,
-          }))
-        )
-      }
-    } catch { /* ignore */ }
   }
 
   if (showAuth) {
@@ -164,7 +133,7 @@ export function MarketplaceLayout() {
                 <Popover open={profileOpen} onOpenChange={setProfileOpen}>
                   <PopoverTrigger asChild>
                     <button
-                      onClick={openProfile}
+                      type="button"
                       className="flex items-center gap-2 rounded-full bg-gray-800 hover:bg-gray-700 px-3 py-1.5 transition-colors cursor-pointer"
                     >
                       <div className="h-6 w-6 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
@@ -213,41 +182,24 @@ export function MarketplaceLayout() {
                         <Gavel className="h-3.5 w-3.5" />
                         My bids & purchases
                       </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full justify-start text-gray-700 hover:text-orange-600 hover:bg-orange-50 gap-2"
+                        onClick={() => {
+                          setProfileOpen(false)
+                          navigate('/my/listings')
+                        }}
+                      >
+                        <Store className="h-3.5 w-3.5" />
+                        My listings
+                      </Button>
                       <Button variant="ghost" size="sm" className="w-full justify-start text-gray-700 hover:text-orange-600 hover:bg-orange-50 gap-2" asChild onClick={() => setProfileOpen(false)}>
                         <Link to="/sell">
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
                           List a New Item
                         </Link>
                       </Button>
-                    </div>
-                    {/* My Listings */}
-                    <div className="px-4 py-3">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">My Active Listings</p>
-                      {myListings.length === 0 ? (
-                        <p className="text-xs text-gray-400 italic">No active listings yet.</p>
-                      ) : (
-                        <ul className="space-y-1">
-                          {myListings.slice(0, 5).map(item => (
-                            <li key={item.id}>
-                              <Link
-                                to={`/auctions/${item.id}`}
-                                onClick={() => setProfileOpen(false)}
-                                className="flex items-center justify-between gap-2 rounded px-2 py-1.5 hover:bg-orange-50 transition-colors group"
-                              >
-                                <span className="text-sm text-gray-700 truncate group-hover:text-orange-600 min-w-0">
-                                  {item.title}
-                                  {item.status !== 'active' && (
-                                    <span className="ml-1 text-[10px] uppercase text-gray-400 font-semibold">
-                                      ({item.status})
-                                    </span>
-                                  )}
-                                </span>
-                                <span className="text-xs font-semibold text-gray-500 shrink-0">${item.current_price.toFixed(2)}</span>
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
                     </div>
                     {/* Footer */}
                     <div className="border-t border-gray-100 px-2 py-2">
@@ -412,6 +364,21 @@ export function MarketplaceLayout() {
                       className="hover:text-orange-400 transition-colors cursor-pointer bg-transparent border-0 p-0 text-inherit font-inherit text-left w-full"
                     >
                       My bids & purchases
+                    </button>
+                  )}
+                </li>
+                <li>
+                  {user ? (
+                    <Link to="/my/listings" className="hover:text-orange-400 transition-colors">
+                      My listings
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setShowAuth('login')}
+                      className="hover:text-orange-400 transition-colors cursor-pointer bg-transparent border-0 p-0 text-inherit font-inherit text-left w-full"
+                    >
+                      My listings
                     </button>
                   )}
                 </li>

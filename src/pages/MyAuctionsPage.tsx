@@ -212,6 +212,14 @@ export function MyAuctionsPage() {
           <PurchaseList rows={data.purchases} />
         </CardContent>
       </Card>
+
+      <p className="text-sm text-gray-600">
+        Selling?{' '}
+        <Link to="/my/listings" className="font-medium text-orange-600 hover:text-orange-700">
+          View all your listings
+        </Link>
+        .
+      </p>
     </main>
   )
 }

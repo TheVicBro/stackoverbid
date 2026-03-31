@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { AlertCircle, CheckCircle2, Gavel, Trophy } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Gavel, Pencil, Trophy } from 'lucide-react'
 import { placeBid } from '@/api/auction'
 import { useAuctionDetail } from '@/hooks/useAuctionDetail'
 import { Button } from '@/components/ui/button'
@@ -142,9 +142,27 @@ export function AuctionDetailPage() {
       </div>
 
       {auction.viewerIsSeller && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50/90 px-3 py-2 text-xs text-amber-950">
-          You are viewing this listing as the <strong>seller</strong>. Bidders see the standard auction page without this
-          notice.
+        <div className="rounded-lg border border-amber-200 bg-amber-50/90 px-3 py-2 text-xs text-amber-950 space-y-2">
+          <p>
+            You are viewing this listing as the <strong>seller</strong>. Bidders see the standard auction page without
+            this notice.
+          </p>
+          {auction.status === 'LIVE' && (
+            <div className="flex flex-wrap items-center gap-2 pt-0.5">
+              {auction.hasBids ? (
+                <p className="text-amber-900/90">
+                  Title and description are locked after the first bid. You can still monitor bids below.
+                </p>
+              ) : (
+                <Button asChild variant="outline" size="sm" className="border-amber-300 text-amber-950 hover:bg-amber-100">
+                  <Link to={`/auctions/${auctionId}/edit`}>
+                    <Pencil className="h-3.5 w-3.5 mr-1.5" />
+                    Edit listing
+                  </Link>
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       )}
 

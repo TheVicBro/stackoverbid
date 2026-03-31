@@ -23,8 +23,10 @@ function baseDetail(
     description: 'Sample listing description for offline demos.',
     imageUrls: [],
     currentBid: 0,
+    startingPrice: 0,
     minIncrement: 1,
     bidCount: 0,
+    hasBids: false,
     endsAt: null,
     viewerIsSeller: false,
     viewerIsWinner: false,
@@ -46,8 +48,10 @@ export function getAuction(
             title: 'Vintage Camera — live auction (sample)',
             status: 'LIVE',
             currentBid: liveAuctionState.currentBid,
+            startingPrice: 100,
             minIncrement: liveAuctionState.minIncrement,
             bidCount: liveAuctionState.bidCount,
+            hasBids: true,
             endsAt: liveAuctionState.endsAt,
             viewerIsSeller: false,
             viewerIsWinner: false,
@@ -62,8 +66,10 @@ export function getAuction(
             title: 'Collectible Card — closed, no bids (sample)',
             status: 'CLOSED',
             currentBid: 0,
+            startingPrice: 10,
             minIncrement: 1,
             bidCount: 0,
+            hasBids: false,
             endsAt: new Date(Date.now() - 86400000).toISOString(),
             outcome: 'UNSOLD',
             viewerIsSeller,
@@ -79,8 +85,10 @@ export function getAuction(
             title: 'Rare Watch — sold, awaiting payment (sample)',
             status: 'CLOSED',
             currentBid: 450,
+            startingPrice: 100,
             minIncrement: 1,
             bidCount: 14,
+            hasBids: true,
             endsAt: new Date(Date.now() - 3600000).toISOString(),
             outcome: 'SOLD',
             unpaidOrderId: 'ord-sample-1',
@@ -96,7 +104,9 @@ export function getAuction(
           title: 'Unknown auction',
           status: 'CLOSED',
           currentBid: 0,
+          startingPrice: 0,
           bidCount: 0,
+          hasBids: false,
           endsAt: new Date().toISOString(),
           outcome: 'UNSOLD',
           viewerIsSeller: false,
@@ -170,6 +180,49 @@ export async function placeBid(auctionId: string, amount: number): Promise<Place
     return { ok: false, message: detail }
   }
 
+  return { ok: false, message: detail }
+}
+
+export interface PatchAuctionItemResult {
+  ok: boolean
+  message?: string
+}
+
+export async function patchAuctionItem(
+  auctionId: string,
+  body: { title: string; description: string }
+): Promise<PatchAuctionItemResult> {
+  const itemId = parseInt(auctionId, 10)
+  if (!Number.isFinite(itemId) || String(itemId) !== auctionId.trim()) {
+    return { ok: false, message: 'Invalid auction.' }
+  }
+
+  const title = body.title.trim()
+  const description = body.description.trim()
+  if (!title || !description) {
+    return { ok: false, message: 'Title and description are required.' }
+  }
+
+  const res = await fetch(`${API_BASE}/auction/items/${itemId}`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, description }),
+  })
+
+  if (res.ok) {
+    return { ok: true }
+  }
+
+  const data = await res.json().catch(() => ({}))
+  const detail = fastApiDetailMessage(data) || 'Could not update listing.'
+
+  if (res.status === 401) {
+    return { ok: false, message: 'You must be signed in to edit a listing.' }
+  }
+  if (res.status === 403 || res.status === 404 || res.status === 400 || res.status === 422) {
+    return { ok: false, message: detail }
+  }
   return { ok: false, message: detail }
 }
 

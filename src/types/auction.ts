@@ -11,8 +11,12 @@ export interface AuctionDetail {
   status: AuctionStatus
   /** Current highest bid in major currency units (e.g. USD) */
   currentBid: number
+  /** Starting price from listing — used with currentBid to infer bids when API omits count. */
+  startingPrice: number
   minIncrement: number
   bidCount: number
+  /** True when at least one bid exists (from catalogue highest_bidder_id). */
+  hasBids: boolean
   /** ISO timestamp when the auction ends or ended */
   endsAt: string | null
   outcome?: AuctionOutcome
