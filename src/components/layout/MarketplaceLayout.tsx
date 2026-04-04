@@ -1,5 +1,5 @@
-import { Link, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { Link, Outlet, useLocation, useNavigate, useNavigationType, useSearchParams } from 'react-router-dom'
+import { useState, useEffect, useLayoutEffect } from 'react'
 import { Gavel, Store } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,10 +15,16 @@ const NAV_CATEGORIES = ['All', ...MARKETPLACE_NAV_TAGS] as const
 export function MarketplaceLayout() {
   const navigate = useNavigate()
   const location = useLocation()
+  const navigationType = useNavigationType()
   const [searchParams] = useSearchParams()
   const [searchDraft, setSearchDraft] = useState('')
 
   const qInUrl = (searchParams.get('q') ?? '').trim()
+
+  useLayoutEffect(() => {
+    if (navigationType === 'POP') return
+    window.scrollTo(0, 0)
+  }, [location.pathname, location.search, navigationType])
 
   useEffect(() => {
     if (location.pathname === '/search') {
