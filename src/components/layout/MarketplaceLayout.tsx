@@ -1,5 +1,5 @@
-import { Link, Outlet, useLocation, useNavigate, useNavigationType, useSearchParams } from 'react-router-dom'
-import { useState, useEffect, useLayoutEffect } from 'react'
+import { Link, Outlet, ScrollRestoration, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { Gavel, Store } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,16 +15,10 @@ const NAV_CATEGORIES = ['All', ...MARKETPLACE_NAV_TAGS] as const
 export function MarketplaceLayout() {
   const navigate = useNavigate()
   const location = useLocation()
-  const navigationType = useNavigationType()
   const [searchParams] = useSearchParams()
   const [searchDraft, setSearchDraft] = useState('')
 
   const qInUrl = (searchParams.get('q') ?? '').trim()
-
-  useLayoutEffect(() => {
-    if (navigationType === 'POP') return
-    window.scrollTo(0, 0)
-  }, [location.pathname, location.search, navigationType])
 
   useEffect(() => {
     if (location.pathname === '/search') {
@@ -69,25 +63,24 @@ export function MarketplaceLayout() {
     navigate('/', { replace: true })
   }
 
-  if (showAuth) {
-    return (
-      <Authentication
-        initialMode={showAuth === "signup" ? "signup" : "login"}
-        onAuthed={() => {
-          fetch(`${API_BASE}/auth/me`, { credentials: "include", cache: "no-store" })
-            .then(res => res.json())
-            .then(data => {
-              setUser(data)
-              setShowAuth(false)
-            })
-            .catch(() => setShowAuth(false))
-        }}
-        onCancel={() => setShowAuth(false)}
-      />
-    )
-  }
-
   return (
+    <>
+      <ScrollRestoration />
+      {showAuth ? (
+        <Authentication
+          initialMode={showAuth === "signup" ? "signup" : "login"}
+          onAuthed={() => {
+            fetch(`${API_BASE}/auth/me`, { credentials: "include", cache: "no-store" })
+              .then(res => res.json())
+              .then(data => {
+                setUser(data)
+                setShowAuth(false)
+              })
+              .catch(() => setShowAuth(false))
+          }}
+          onCancel={() => setShowAuth(false)}
+        />
+      ) : (
     <div className="min-h-screen bg-stone-100 text-gray-900 flex flex-col dark:bg-background dark:text-foreground">
       <nav className="sticky top-0 z-50 bg-gray-900 border-b-[3px] border-orange-500">
         <div className="max-w-7xl mx-auto px-4 h-14 grid grid-cols-[auto_1fr_auto] items-center gap-4 md:gap-6">
@@ -420,5 +413,7 @@ export function MarketplaceLayout() {
         </div>
       </footer>
     </div>
+      )}
+    </>
   )
 }
