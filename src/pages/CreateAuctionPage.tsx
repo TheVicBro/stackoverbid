@@ -44,7 +44,9 @@ export function CreateAuctionPage() {
 
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [tagSuggesting, setTagSuggesting] = useState(false)
+  const [tagSuggestLabel, setTagSuggestLabel] = useState('Suggest with Gemini')
   const [tagHint, setTagHint] = useState<string | null>(null)
+  const tagSuggestTimers = useRef<ReturnType<typeof setTimeout>[]>([])
 
   const CLOUD_NAME = (import.meta.env.VITE_CLOUDINARY_CLOUD_NAME as string | undefined)?.trim() ?? ''
   const UPLOAD_PRESET = (import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET as string | undefined)?.trim() ?? ''
@@ -132,12 +134,29 @@ export function CreateAuctionPage() {
     })
   }
 
+  function clearTagSuggestTimers() {
+    tagSuggestTimers.current.forEach(clearTimeout)
+    tagSuggestTimers.current = []
+  }
+
   async function runSuggestFromGemini() {
     setTagSuggesting(true)
+    setTagSuggestLabel('Suggesting…')
     setError(null)
     setTagHint(null)
+
+    // Progressive status labels so the user knows something is happening.
+    tagSuggestTimers.current = [
+      setTimeout(() => setTagSuggestLabel('Analyzing…'), 4_000),
+      setTimeout(() => setTagSuggestLabel('Still working…'), 12_000),
+    ]
+
     const res = await suggestListingDraft({ title, description, imageUrls })
+
+    clearTagSuggestTimers()
     setTagSuggesting(false)
+    setTagSuggestLabel('Suggest with Gemini')
+
     if (!res.ok) {
       setError(res.message)
       return
@@ -419,7 +438,7 @@ export function CreateAuctionPage() {
                   ) : (
                     <Sparkles className="h-4 w-4 mr-1.5" />
                   )}
-                  Suggest with Gemini
+                  {tagSuggestLabel}
                 </Button>
               </div>
               {tagHint && (
