@@ -1,73 +1,44 @@
-# React + TypeScript + Vite
+# StackOverbid
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Auction marketplace frontend: browse listings, bid in real time against a closing clock, manage your own auctions, and check out a won item.
 
-Currently, two official plugins are available:
+**Live demo:** [stackoverbid.vercel.app](https://stackoverbid.vercel.app)  
+**API:** [TheVicBro/stackoverbid-be](https://github.com/TheVicBro/stackoverbid-be)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Team course project. Checkout records an order in the app (shipping choice, receipt) — it is not a card processor.
 
-## React Compiler
+## Stack
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+React 19, TypeScript, Vite, Tailwind, React Router. Talks to the FastAPI backend (JWT cookie + `/api` proxy in local dev). Listing images go through Cloudinary unsigned upload when those env vars are set.
 
-## Expanding the ESLint configuration
+## What it does
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Catalogue home (ending soon / newest / most active) and search
+- Auction detail with live countdown, gallery, and bid form
+- Create / edit listings, including image reorder
+- Auth, profile, notifications
+- Buyer dashboard (auctions you bid on) and seller listings
+- Checkout + unpaid-order follow-up after you win
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Local setup
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+cp .env.example .env
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+`.env` (see `.env.example`):
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+VITE_API_BASE_URL=http://localhost:8000
+VITE_CLOUDINARY_CLOUD_NAME=
+VITE_CLOUDINARY_UPLOAD_PRESET=
+```
+
+Run the [backend](https://github.com/TheVicBro/stackoverbid-be) on port 8000, then:
+
+```bash
+npm run dev
+```
+
+Vite is on [http://localhost:3000](http://localhost:3000) and proxies `/api` to the API so cookies work in development.
